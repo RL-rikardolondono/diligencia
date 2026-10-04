@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: diligencia-api
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/ping
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: SETUP_KEY
+        generateValue: true
+      - key: CRON_KEY
+        generateValue: true
+      - key: BREVO_KEY
+        sync: false
+      - key: REMITENTE
+        value: contacto@skynetgenesis.com
+      - key: APP_URL
+        value: https://diligencia.skynetgenesis.com
