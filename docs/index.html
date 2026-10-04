@@ -1,0 +1,1052 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="description" content="DiligencIA – gestión integral para abogados y bufetes. SkyNet Genesis.">
+<title>DiligencIA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: barra superior azul petróleo + menú lateral (escritorio) / pestañas desplazables (celular) + área de trabajo con tarjetas por rol */
+:root{
+  --petroleo:#1E3A4C; --ambar:#E0A21A; --wa:#1F8A4C;
+  --bg:#EEF2F1; --surface:#FFFFFF; --fg:#15232B; --muted:#5B6B72; --line:#D6DFDD; --soft:#F5F8F7;
+  --rojo:#C0392B; --rojo-bg:#FBEAE8; --amb-bg:#FCF3DD; --ver-bg:#E4F3EA; --azul-bg:#E3ECF1;
+  --f-tit:"Barlow Condensed","Arial Narrow",Arial,sans-serif; --f-txt:"Public Sans",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1A20; --surface:#17262F; --fg:#E4ECEE; --muted:#9AAAB0; --line:#2A3C46; --soft:#1C2E38;
+  --rojo:#F07A6C; --rojo-bg:#3A1F1C; --amb-bg:#3A2F14; --ver-bg:#173326; --azul-bg:#1D3341; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1A20; --surface:#17262F; --fg:#E4ECEE; --muted:#9AAAB0; --line:#2A3C46; --soft:#1C2E38;
+  --rojo:#F07A6C; --rojo-bg:#3A1F1C; --amb-bg:#3A2F14; --ver-bg:#173326; --azul-bg:#1D3341; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-txt);font-size:14px;line-height:1.5}
+h1,h2,h3,h4{font-family:var(--f-tit);font-weight:700;margin:0;text-wrap:balance;letter-spacing:.01em}
+h2{font-size:26px} h3{font-size:19px} h4{font-size:16px}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--petroleo)}
+:root:not([data-theme="light"]) a{color:inherit}
+.num{font-variant-numeric:tabular-nums}
+/* barra superior */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:#1E3A4C;color:#fff;display:flex;align-items:center;gap:12px;padding:8px 16px;min-height:58px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand svg{width:36px;height:36px;flex:none}
+.brand .bt{font-family:var(--f-tit);font-weight:700;line-height:1;font-size:22px;letter-spacing:.02em}
+.brand .bt small{display:block;font-size:11px;color:#E0A21A;letter-spacing:.14em}
+.top .ofi{margin-left:auto;display:flex;align-items:center;gap:10px;min-width:0}
+.ofi-logo{width:34px;height:34px;border-radius:8px;background:#fff;object-fit:contain;flex:none}
+.ofi-name{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+.ofi-user{font-size:11px;opacity:.8}
+.top select{background:#2B4E63;border:1px solid #3D6378;color:#fff;border-radius:8px;padding:6px 8px;max-width:150px}
+.top .salir{background:transparent;border:1px solid #5C7C8E;color:#fff;border-radius:8px;padding:6px 10px;cursor:pointer}
+/* estructura */
+.shell{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 58px)}
+nav.menu{background:var(--surface);border-right:1px solid var(--line);padding:14px 10px;display:flex;flex-direction:column;gap:2px}
+nav.menu button{display:flex;align-items:center;gap:10px;text-align:left;background:none;border:0;border-radius:8px;padding:9px 12px;cursor:pointer;color:var(--fg);font-weight:500}
+nav.menu button:hover{background:var(--soft)}
+nav.menu button.on{background:#1E3A4C;color:#fff;box-shadow:inset 4px 0 0 #E0A21A}
+nav.menu .cnt{margin-left:auto;background:var(--ambar);color:#15232B;border-radius:20px;font-size:11px;font-weight:700;padding:0 7px}
+main{padding:20px 16px 60px;min-width:0;max-width:1240px;width:100%}
+.head{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;margin-bottom:16px}
+.head p{margin:2px 0 0;color:var(--muted)}
+.head .acc{margin-left:auto;display:flex;flex-wrap:wrap;gap:8px}
+@media (max-width:860px){
+  .shell{grid-template-columns:1fr}
+  nav.menu{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line);padding:8px 10px;position:sticky;top:calc(58px + env(safe-area-inset-top,0px));z-index:15}
+  nav.menu button{white-space:nowrap;padding:7px 11px}
+  nav.menu button.on{box-shadow:inset 0 -3px 0 #E0A21A}
+  .ofi-name{max-width:120px}
+  .top .ofi-user,.brand .bt small{display:none}
+}
+@media (max-width:520px){ .top select{max-width:100px} .ofi-logo{display:none} }
+/* componentes */
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:8px;border:1px solid var(--line);background:var(--surface);padding:8px 13px;cursor:pointer;font-weight:600;font-size:13px;color:var(--fg);text-decoration:none}
+.btn:hover{border-color:var(--petroleo)}
+.btn.pri{background:#1E3A4C;border-color:#1E3A4C;color:#fff}
+.btn.pri:hover{background:#28506A}
+.btn.amb{background:#E0A21A;border-color:#E0A21A;color:#15232B}
+.btn.wa{background:#1F8A4C;border-color:#1F8A4C;color:#fff}
+.btn.peq{padding:4px 9px;font-size:12px}
+.btn.del{color:var(--rojo)}
+.btn:focus-visible,nav.menu button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #E0A21A;outline-offset:2px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;min-width:0}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.kpi .k{font-family:var(--f-tit);font-size:clamp(22px,4.6vw,34px);font-weight:700;line-height:1.1}
+.kpi .l{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.kpi .s{font-size:12px;color:var(--muted)}
+.kpi.alerta{border-color:#E0A21A;box-shadow:inset 0 3px 0 #E0A21A}
+.kpi.peligro{border-color:var(--rojo);box-shadow:inset 0 3px 0 var(--rojo)}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;padding:9px 10px;border-bottom:1px solid var(--line);background:var(--soft);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+tr.click{cursor:pointer} tr.click:hover td{background:var(--soft)}
+.pill{display:inline-block;border-radius:20px;padding:1px 9px;font-size:11px;font-weight:700;white-space:nowrap}
+.p-rojo{background:var(--rojo-bg);color:var(--rojo)}
+.p-amb{background:var(--amb-bg);color:#9A6A00}
+:root:not([data-theme="light"]) .p-amb{color:#9A6A00}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .p-amb{color:#F0C25A}}
+:root[data-theme="dark"] .p-amb{color:#F0C25A}
+.p-ver{background:var(--ver-bg);color:#1F8A4C}
+.p-azul{background:var(--azul-bg);color:var(--fg)}
+.p-gris{background:var(--soft);color:var(--muted);border:1px solid var(--line)}
+.muted{color:var(--muted)} .small{font-size:12px}
+.list{display:flex;flex-direction:column}
+.li{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}
+.li:last-child{border-bottom:0}
+.li .dot{width:10px;height:10px;border-radius:50%;margin-top:6px;flex:none}
+.li .grow{flex:1;min-width:0}
+.d-rojo{background:var(--rojo)} .d-amb{background:#E0A21A} .d-ver{background:#1F8A4C} .d-azul{background:#1E3A4C}
+.fecha{font-family:var(--f-tit);font-weight:600;font-size:15px;text-align:center;min-width:48px;line-height:1.05;border:1px solid var(--line);border-radius:8px;padding:4px 6px;background:var(--soft)}
+.fecha b{display:block;font-size:22px}
+form.f,.f{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.f label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--muted)}
+.f .full{grid-column:1/-1}
+.f input,.f select,.f textarea{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--surface);font-weight:400;font-size:14px;color:var(--fg);min-width:0}
+.f textarea{min-height:70px;resize:vertical}
+.chk{flex-direction:row!important;align-items:center;gap:8px!important;color:var(--fg)!important;font-weight:500!important}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:center}
+.toolbar input,.toolbar select{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--surface);min-width:0}
+.toolbar input[type=search]{flex:1;min-width:180px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:14px;overflow-x:auto}
+.tabs button{background:none;border:0;padding:8px 12px;cursor:pointer;font-weight:600;color:var(--muted);border-bottom:3px solid transparent;white-space:nowrap}
+.tabs button.on{color:var(--fg);border-bottom-color:#E0A21A}
+.empty{padding:26px;text-align:center;color:var(--muted)}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 12px;font-size:13px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;min-width:0;overflow-wrap:anywhere}
+@media (max-width:520px){.kv{grid-template-columns:1fr}.kv dt{font-weight:600}}
+.rad{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;letter-spacing:.02em}
+.rad span{padding:0 1px;border-bottom:2px solid var(--line);margin-right:2px}
+.note{background:var(--azul-bg);border-radius:8px;padding:10px 12px;font-size:13px}
+.note.amb{background:var(--amb-bg)}
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(10,20,26,.55);z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:30px 16px;overflow-y:auto}
+.modal .box{background:var(--surface);border-radius:12px;width:100%;max-width:760px;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal .box.ancho{max-width:900px}
+.modal .mh{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.modal .mh .x{margin-left:auto;background:none;border:0;font-size:24px;cursor:pointer;color:var(--muted);line-height:1}
+.modal .mf{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;margin-top:16px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#1E3A4C;color:#fff;padding:10px 18px;border-radius:8px;z-index:60;font-weight:600;box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:calc(100% - 32px)}
+/* documento imprimible: siempre en blanco */
+.doc{background:#fff;color:#15232B;border:1px solid #D6DFDD;border-radius:6px;padding:34px 38px;font-family:var(--f-txt);font-size:13.5px;line-height:1.6}
+.doc h1{font-size:24px;color:#1E3A4C;margin:0}
+.doc .dh{display:flex;align-items:center;gap:14px;border-bottom:3px solid #1E3A4C;padding-bottom:12px;margin-bottom:18px}
+.doc .dh img{width:58px;height:58px;object-fit:contain}
+.doc .dh .meta{margin-left:auto;text-align:right;font-size:12px;color:#5B6B72}
+.doc table{font-size:13px} .doc th{background:#EEF2F1;color:#1E3A4C} .doc td,.doc th{border-bottom:1px solid #D6DFDD}
+.doc .tot{font-family:var(--f-tit);font-size:22px;color:#1E3A4C}
+.doc .firma{margin-top:46px;display:flex;gap:40px;flex-wrap:wrap}
+.doc .firma div{border-top:1px solid #15232B;padding-top:4px;min-width:220px;font-size:12px}
+.doc .pie{margin-top:28px;border-top:1px solid #D6DFDD;padding-top:8px;font-size:10.5px;color:#5B6B72;display:flex;align-items:center;gap:8px}
+.doc .pie svg{width:18px;height:18px}
+.doc mark.ph{background:#FCF3DD;color:#15232B;border-radius:3px;padding:0 2px}
+.doc .doc-body{outline:none}.doc .doc-body:focus{box-shadow:0 0 0 2px #E0A21A33;border-radius:4px}
+.doc h4{font-size:14px;color:#1E3A4C;margin:14px 0 4px}
+@media print{.doc mark.ph{background:none}}
+@media (max-width:600px){.doc{padding:20px 16px}}
+/* calendario */
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface)}
+.cal .dn{background:var(--soft);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);text-align:center;padding:6px 0;border-bottom:1px solid var(--line)}
+.cal .c{min-height:92px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:4px;font-size:11px;min-width:0}
+.cal .c:nth-child(7n){border-right:0}
+.cal .c.fuera{background:var(--soft);opacity:.55}
+.cal .c.inh{background:repeating-linear-gradient(135deg,var(--soft),var(--soft) 6px,var(--surface) 6px,var(--surface) 12px)}
+.cal .c.hoy .n{background:#E0A21A;color:#15232B;border-radius:50%}
+.cal .n{display:inline-block;width:22px;height:22px;text-align:center;line-height:22px;font-weight:700}
+.cal .ev{display:block;border-radius:4px;padding:1px 4px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;border:0;width:100%;text-align:left;font-size:11px}
+.cal .ev.aud{background:#1E3A4C;color:#fff} .cal .ev.ter{background:var(--rojo-bg);color:var(--rojo)} .cal .ev.otr{background:var(--amb-bg);color:var(--fg)}
+.cal .fest{display:block;font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:600px){.cal .c{min-height:58px}.cal .ev{font-size:0;height:6px;padding:0}}
+/* acceso */
+.login{min-height:100%;display:flex;align-items:center;justify-content:center;padding:30px 16px;background:linear-gradient(160deg,#1E3A4C 0,#1E3A4C 46%,var(--bg) 46%)}
+.login .box{background:var(--surface);border-radius:14px;max-width:560px;width:100%;padding:28px;box-shadow:0 18px 50px rgba(0,0,0,.18)}
+.roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:14px}
+.roles button{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:12px;text-align:left;cursor:pointer}
+.roles button:hover{border-color:#E0A21A;box-shadow:inset 0 0 0 1px #E0A21A}
+.roles b{display:block;font-family:var(--f-tit);font-size:17px}
+.roles span{font-size:12px;color:var(--muted)}
+.bar{height:8px;border-radius:5px;background:var(--soft);overflow:hidden}
+.bar i{display:block;height:100%;background:#1E3A4C}
+.bar i.a{background:#E0A21A}
+@media (prefers-reduced-motion:no-preference){.toast{animation:up .25s ease}@keyframes up{from{transform:translate(-50%,10px);opacity:0}}}
+</style>
+</head><body>
+<div id="app"></div>
+<div id="modal"></div>
+<div id="toast"></div>
+<script src="config.js"></script><script>
+// ===================== DiligencIA · núcleo =====================
+const LOGO_SG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" aria-hidden="true"><rect x="4" y="4" width="192" height="192" rx="46" fill="#1E3A4C"/><g stroke="#FFFFFF" stroke-linecap="round"><polygon points="100,42 150.2,71 150.2,129 100,158 49.8,129 49.8,71" fill="none" stroke-opacity=".35" stroke-width="4"/><path d="M100 100L100 42M100 100L150.2 71M100 100L150.2 129M100 100L100 158M100 100L49.8 129M100 100L49.8 71" stroke-width="6"/></g><g fill="#FFFFFF"><circle cx="150.2" cy="71" r="10"/><circle cx="150.2" cy="129" r="10"/><circle cx="100" cy="158" r="10"/><circle cx="49.8" cy="129" r="10"/><circle cx="49.8" cy="71" r="10"/></g><circle cx="100" cy="42" r="13" fill="#E0A21A"/><circle cx="100" cy="100" r="20" fill="#E0A21A"/></svg>';
+const SG = {correo:'contacto@skynetgenesis.com', wa:'3044375758'};
+const EN_MARCO = (()=>{try{return window.self!==window.top}catch(e){return true}})();
+const KEY='diligencia_v1';
+
+// ---------- utilidades ----------
+const $=s=>document.querySelector(s);
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-3);
+const pad=n=>String(n).padStart(2,'0');
+const ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const pd=s=>{if(!s)return null;const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const HOY=ymd(new Date());
+const addD=(s,n)=>{const d=pd(s);d.setDate(d.getDate()+n);return ymd(d)};
+const diffD=(a,b)=>Math.round((pd(b)-pd(a))/864e5); // b - a
+const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const MES3=['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+const DIAS=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+const fLarga=s=>{if(!s)return '';const d=pd(s);return d.getDate()+' de '+MESES[d.getMonth()]+' de '+d.getFullYear()};
+const fCorta=s=>{if(!s)return '—';const d=pd(s);return pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()};
+const fDia=s=>{const d=pd(s);return DIAS[d.getDay()]+' '+d.getDate()+' '+MES3[d.getMonth()].toLowerCase()};
+const cop=n=>'$'+Math.round(Number(n)||0).toLocaleString('es-CO');
+const num=v=>Number(String(v).replace(/[^\d.-]/g,''))||0;
+
+// ---------- calendario judicial colombiano ----------
+function pascua(y){const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mes=Math.floor((h+l-7*m+114)/31),dia=((h+l-7*m+114)%31)+1;return new Date(y,mes-1,dia)}
+const _fest={};
+function festivos(y){ // Ley 51 de 1983 (Ley Emiliani)
+  if(_fest[y])return _fest[y];
+  const r={};const fijo=(m,d,n)=>r[ymd(new Date(y,m-1,d))]=n;
+  const lunes=(m,d,n)=>{const x=new Date(y,m-1,d);const w=x.getDay();if(w!==1)x.setDate(x.getDate()+((8-w)%7));r[ymd(x)]=n};
+  const p=pascua(y);const rel=(n,t)=>{const x=new Date(p);x.setDate(x.getDate()+n);r[ymd(x)]=t};
+  fijo(1,1,'Año Nuevo');fijo(5,1,'Día del Trabajo');fijo(7,20,'Independencia');fijo(8,7,'Batalla de Boyacá');fijo(12,8,'Inmaculada Concepción');fijo(12,25,'Navidad');
+  lunes(1,6,'Reyes Magos');lunes(3,19,'San José');lunes(6,29,'San Pedro y San Pablo');lunes(8,15,'Asunción de la Virgen');lunes(10,12,'Día de la Raza');lunes(11,1,'Todos los Santos');lunes(11,11,'Independencia de Cartagena');
+  rel(-3,'Jueves Santo');rel(-2,'Viernes Santo');rel(43,'Ascensión del Señor');rel(64,'Corpus Christi');rel(71,'Sagrado Corazón');
+  return _fest[y]=r;
+}
+function semanaSanta(y){const p=pascua(y);return [-6,-5,-4].map(n=>{const x=new Date(p);x.setDate(x.getDate()+n);return ymd(x)})}
+function enVacancia(s){const d=pd(s);const m=d.getMonth()+1,dd=d.getDate();return (m===12&&dd>=20)||(m===1&&dd<=10)}
+function motivoInhabil(s,opt){ // opt: {vacancia,semanaSanta,cierres[]}
+  const d=pd(s);const w=d.getDay();
+  if(w===0)return 'Domingo'; if(w===6)return 'Sábado';
+  const f=festivos(d.getFullYear())[s]; if(f)return 'Festivo: '+f;
+  if(opt.vacancia&&enVacancia(s))return 'Vacancia judicial (20 dic – 10 ene)';
+  if(opt.semanaSanta&&semanaSanta(d.getFullYear()).includes(s))return 'Semana Santa (despachos cerrados)';
+  const c=(opt.cierres||[]).find(x=>x.fecha===s); if(c)return 'Cierre: '+c.motivo;
+  return '';
+}
+const habil=(s,opt)=>!motivoInhabil(s,opt);
+function sigHabil(s,opt){let x=s;while(!habil(x,opt))x=addD(x,1);return x}
+function sumarHabiles(s,n,opt){let x=s,c=0;while(c<n){x=addD(x,1);if(habil(x,opt))c++}return x}
+function habilesEntre(a,b,opt){ // días hábiles desde a (excl.) hasta b (incl.); negativo si b<a
+  if(a===b)return 0; let c=0; if(b>a){let x=a;while(x<b){x=addD(x,1);if(habil(x,opt))c++}return c}
+  let x=b;while(x<a){x=addD(x,1);if(habil(x,opt))c++}return -c;
+}
+// Cómputo de términos: CGP art. 118 y Ley 2213 de 2022 art. 8
+function calcularTermino({fecha,cantidad,unidad,ley2213,opt}){
+  const pasos=[];let base=fecha;
+  if(ley2213){base=sumarHabiles(fecha,2,opt);pasos.push('Envío del mensaje de datos: '+fLarga(fecha)+'. La notificación se entiende surtida al terminar 2 días hábiles: '+fLarga(base)+' (Ley 2213/2022, art. 8).')}
+  else pasos.push('Fecha de notificación o de la providencia: '+fLarga(fecha)+'.');
+  let venc;
+  if(unidad==='h'){venc=sumarHabiles(base,cantidad,opt);pasos.push('El término corre desde el día hábil siguiente ('+fLarga(sumarHabiles(base,1,opt))+') y se cuentan '+cantidad+' días hábiles, sin sábados, domingos, festivos'+(opt.vacancia?', vacancia judicial':'')+(opt.semanaSanta?', Semana Santa':'')+' ni cierres registrados (CGP art. 118).')}
+  else{
+    const d=pd(base);
+    if(unidad==='c')d.setDate(d.getDate()+cantidad); else if(unidad==='m')d.setMonth(d.getMonth()+cantidad); else d.setFullYear(d.getFullYear()+cantidad);
+    venc=ymd(d);pasos.push('Término en '+({c:'días calendario',m:'meses',a:'años'})[unidad]+': se cuenta conforme al calendario hasta '+fLarga(venc)+'.');
+    const m=motivoInhabil(venc,opt);
+    if(m){const v2=sigHabil(venc,opt);pasos.push('Ese día es inhábil ('+m+'); el vencimiento se traslada al primer día hábil siguiente: '+fLarga(v2)+' (CGP art. 118, inc. final).');venc=v2}
+  }
+  return {venc,pasos};
+}
+
+// ---------- catálogo de términos con fundamento normativo ----------
+const CATALOGO=[
+ {g:'Civil, familia y comercial (CGP – Ley 1564 de 2012)',t:[
+  ['Ejecutoria de providencia',3,'h','CGP art. 302'],
+  ['Recurso de reposición contra auto',3,'h','CGP art. 318'],
+  ['Recurso de apelación contra auto (fuera de audiencia)',3,'h','CGP art. 322'],
+  ['Apelación de sentencia escrita',3,'h','CGP art. 322'],
+  ['Sustentación de la apelación en segunda instancia',5,'h','Ley 2213/2022 art. 12'],
+  ['Subsanar demanda inadmitida',5,'h','CGP art. 90'],
+  ['Contestación demanda – proceso verbal',20,'h','CGP art. 369'],
+  ['Contestación demanda – verbal sumario',10,'h','CGP art. 391'],
+  ['Traslado de excepciones de mérito',5,'h','CGP art. 370'],
+  ['Ejecutivo: pagar la obligación',5,'h','CGP art. 431'],
+  ['Ejecutivo: proponer excepciones de mérito',10,'h','CGP art. 442'],
+  ['Interponer recurso de casación',5,'h','CGP art. 337'],
+  ['Cumplir carga procesal (evitar desistimiento tácito)',30,'h','CGP art. 317'],
+ ]},
+ {g:'Contencioso administrativo (CPACA – Ley 1437 de 2011, mod. Ley 2080 de 2021)',t:[
+  ['Recursos contra acto administrativo (reposición/apelación)',10,'h','CPACA art. 76'],
+  ['Traslado para contestar la demanda',30,'h','CPACA art. 172'],
+  ['Apelación de sentencia',10,'h','CPACA art. 247'],
+  ['Caducidad – nulidad y restablecimiento del derecho',4,'m','CPACA art. 164-2-d'],
+  ['Caducidad – reparación directa',2,'a','CPACA art. 164-2-i'],
+  ['Caducidad – controversias contractuales',2,'a','CPACA art. 164-2-j'],
+ ]},
+ {g:'Laboral y seguridad social (CPTSS)',t:[
+  ['Contestación demanda ordinaria laboral',10,'h','CPTSS art. 74'],
+  ['Apelación de auto presentada por escrito',5,'h','CPTSS art. 65'],
+  ['Prescripción de derechos laborales',3,'a','CST art. 488 · CPTSS art. 151'],
+ ]},
+ {g:'Tutela y derecho de petición',t:[
+  ['Impugnación del fallo de tutela',3,'h','Decreto 2591/1991 art. 31',true],
+  ['Plazo del juez para fallar la tutela',10,'h','Decreto 2591/1991 art. 29',true],
+  ['Respuesta a derecho de petición (general)',15,'h','Ley 1755/2015 art. 14'],
+  ['Petición de documentos o información',10,'h','Ley 1755/2015 art. 14'],
+  ['Petición de consulta',30,'h','Ley 1755/2015 art. 14'],
+ ]},
+];
+const SISTEMAS={
+ 'CPNU':{n:'Consulta Nacional Unificada (Justicia XXI / Tyba)',u:'https://consultaprocesos.ramajudicial.gov.co/Procesos/NumeroRadicacion'},
+ 'SIUGJ':{n:'SIUGJ – Sistema Integrado de Gestión Judicial',u:'https://siugj.ramajudicial.gov.co/principalPortal/index.php'},
+ 'SAMAI':{n:'SAMAI – Jurisdicción Contencioso Administrativa',u:'https://samai.consejodeestado.gov.co/'},
+ 'FISCALIA':{n:'Fiscalía – consulta por NUNC (SPOA)',u:'https://www.fiscalia.gov.co/colombia/'},
+ 'OTRO':{n:'Otra entidad (superintendencia, notaría, etc.)',u:''},
+};
+const ROLES={
+ admin:{n:'Socio administrador',d:'Todo: oficina, usuarios, cobros y reportes',menu:['inicio','clientes','procesos','terminos','agenda','tareas','cobros','documentos','reportes','usuarios','config','normas']},
+ abogado:{n:'Abogado',d:'Clientes, procesos, términos, agenda y documentos',menu:['inicio','clientes','procesos','terminos','agenda','tareas','documentos','normas']},
+ dependiente:{n:'Dependiente judicial',d:'Vigilancia de procesos, actuaciones, agenda y tareas',menu:['inicio','procesos','terminos','agenda','tareas','normas']},
+ contable:{n:'Contabilidad',d:'Honorarios, cuentas de cobro, pagos y cartera',menu:['inicio','clientes','cobros','reportes']},
+ cliente:{n:'Cliente (portal)',d:'Consulta sus procesos, audiencias y cuentas',menu:['portal']},
+};
+const MENU={inicio:'Inicio',portal:'Mis procesos',clientes:'Clientes',procesos:'Procesos y asuntos',terminos:'Términos',agenda:'Agenda',tareas:'Tareas',cobros:'Honorarios y cobros',documentos:'Documentos',reportes:'Reportes',usuarios:'Usuarios',config:'Configuración',normas:'Normativa'};
+const PLANES=[
+ {id:'ind',n:'Independiente',u:1,p:59000,d:'1 abogado + 1 dependiente'},
+ {id:'ofi',n:'Oficina',u:5,p:129000,d:'Hasta 5 abogados'},
+ {id:'fir',n:'Firma',u:15,p:249000,d:'Hasta 15 abogados'},
+ {id:'cor',n:'Corporativo',u:999,p:390000,d:'16 o más abogados'},
+];
+
+// ---------- datos ----------
+let DB=null, S={of:null,user:null,vista:'inicio',sub:{}};
+let MODO='demo';
+const API=String(window.DILIGENCIA_API||'').replace(/\/$/,'');
+function guardar(){if(MODO==='real'){syncReal();return}try{localStorage.setItem(KEY,JSON.stringify(DB))}catch(e){}}
+function cargar(){MODO='demo';DB=null;try{const t=localStorage.getItem(KEY);if(t)DB=JSON.parse(t)}catch(e){} if(!DB||!DB.oficinas){DB=demo()} DB.plantillas=DB.plantillas||[];try{localStorage.setItem(KEY,JSON.stringify(DB))}catch(e){}}
+const OF=()=>DB.oficinas.find(o=>o.id===S.of);
+const de=(col)=>DB[col].filter(x=>x.oficinaId===S.of);
+const byId=(col,id)=>DB[col].find(x=>x.id===id);
+const optOf=(p)=>{const o=OF();const c=o.config;return {vacancia:c.vacancia&&!(p&&p.sinVacancia),semanaSanta:c.semanaSanta&&!(p&&p.sinVacancia),cierres:c.cierres}};
+const nomUser=id=>(byId('users',id)||{}).nombre||'—';
+const nomCli=id=>(byId('clientes',id)||{}).nombre||'—';
+const procTxt=p=>p?(p.alias||p.clase)+' · '+(p.radicado?p.radicado.slice(-11,-2):'sin radicado'):'—';
+
+function demo(){
+  const o1='of1',o2='of2';const H=HOY,d=n=>addD(H,n);
+  const db={oficinas:[
+    {id:o1,nombre:'Londoño & Asociados Abogados',nit:'901.555.210-4',ciudad:'Santa Marta',direccion:'Calle 22 No. 5-40, Of. 302',tel:'3001234567',email:'contacto@londonoasociados.co',logo:'',plan:'ofi',config:{vacancia:true,semanaSanta:true,cierres:[{fecha:sigHabil(d(30),{vacancia:true,semanaSanta:true,cierres:[]}),motivo:'Cierre extraordinario de despachos (ejemplo)'}],consecutivo:7}},
+    {id:o2,nombre:'Abg. Carolina Díaz (independiente)',nit:'1.082.900.123-1',ciudad:'Barranquilla',direccion:'Cra. 54 No. 70-12',tel:'3015550000',email:'cdiaz.abogada@correo.co',logo:'',plan:'ind',config:{vacancia:true,semanaSanta:true,cierres:[],consecutivo:1}},
+  ],plantillas:[{id:'pl1',oficinaId:'of1',base:'proc',nombre:'Memorial de sustitución de correo electrónico (ejemplo)',texto:'Señor(a) Juez\n{{despacho}}\nE. S. D.\n\nReferencia: {{clase}}\nRadicado: {{radicado}}\n\n{{abogado}}, apoderado(a) de {{cliente}}, informo al despacho que a partir de la fecha recibiré notificaciones en el correo {{abogado_correo}}, inscrito en el Registro Nacional de Abogados, conforme a la Ley 2213 de 2022.\n\n{{abogado}}\nT.P. {{tarjeta}}'}],users:[],clientes:[],procesos:[],terminos:[],agenda:[],tareas:[],cobros:[],pagos:[],gastos:[]};
+  const U=(id,of,nombre,rol,email,tp)=>db.users.push({id,oficinaId:of,nombre,rol,email,tp,activo:true});
+  U('u1',o1,'Ricardo Londoño','admin','rlondono@londonoasociados.co','TP 145.220');
+  U('u2',o1,'Mariana Pérez Gómez','abogado','mperez@londonoasociados.co','TP 298.114');
+  U('u3',o1,'Andrés Fajardo Ríos','abogado','afajardo@londonoasociados.co','TP 312.507');
+  U('u4',o1,'Luisa Fernanda Ortiz','dependiente','lortiz@londonoasociados.co','');
+  U('u5',o1,'Jorge Iván Mejía','contable','contabilidad@londonoasociados.co','');
+  U('u6',o2,'Carolina Díaz','admin','cdiaz.abogada@correo.co','TP 255.801');
+  const C=(id,of,nombre,tipo,doc,tel,email,dir,extra={})=>db.clientes.push(Object.assign({id,oficinaId:of,nombre,tipo,doc,tel,email,dir,habeas:true,habeasFecha:d(-120),canal:email,notas:'',creado:d(-150)},extra));
+  C('c1',o1,'Inversiones Bahía Taganga S.A.S.','Jurídica','NIT 900.321.654-1','3104445566','gerencia@bahiataganga.co','Cra. 1 No. 10-20, Santa Marta',{contacto:'Patricia Navarro (Gerente)'});
+  C('c2',o1,'José Manuel Herrera Vives','Natural','CC 85.456.789','3157778899','jmherrera@correo.co','Calle 30 No. 12-45, Santa Marta');
+  C('c3',o1,'María Alejandra Cantillo','Natural','CC 1.004.567.321','3009991122','macantillo@correo.co','Mz 4 Casa 12, Bastidas, Santa Marta');
+  C('c4',o1,'Distribuidora del Caribe Ltda.','Jurídica','NIT 819.004.321-7','3205554433','juridica@districaribe.co','Zona Industrial, Santa Marta',{contacto:'Hernán Ospino (Representante legal)'});
+  C('c5',o1,'Luis Carlos Pertuz','Natural','CC 7.144.220','3112223344','lcpertuz@correo.co','Rodadero, Santa Marta',{habeas:false,habeasFecha:''});
+  C('c6',o2,'Ana Sofía Barrios','Natural','CC 32.700.111','3128887766','asbarrios@correo.co','Barranquilla');
+  const P=(id,of,cli,ab,o)=>db.procesos.push(Object.assign({id,oficinaId:of,clienteId:cli,abogadoId:ab,tipo:'Judicial',estado:'Activo',sistema:'CPNU',actuaciones:[],honorarios:{modalidad:'Suma fija',valor:0,porcentaje:0},sinVacancia:false},o));
+  P('p1',o1,'c1','u2',{alias:'Restitución local Taganga',radicado:'47001418900320250041200',jurisdiccion:'Ordinaria',especialidad:'Civil',clase:'Verbal – restitución de inmueble arrendado',despacho:'Juzgado 3.º de Pequeñas Causas y Competencia Múltiple de Santa Marta',ciudad:'Santa Marta',demandante:'Inversiones Bahía Taganga S.A.S.',demandado:'Comercializadora Sol y Mar S.A.S.',rolCliente:'Demandante',etapa:'Contestación / traslado',cuantia:48000000,fechaInicio:d(-95),ultimaRevision:d(-2),honorarios:{modalidad:'Suma fija por cuotas',valor:9000000,porcentaje:0},
+    actuaciones:[{f:d(-95),t:'Radicación de la demanda por correo electrónico (Ley 2213, art. 6).',u:'u2',pub:true},{f:d(-60),t:'Auto admite demanda. Se ordena notificar al demandado.',u:'u4',pub:true},{f:d(-6),t:'Envío de notificación personal por mensaje de datos al demandado (art. 8 Ley 2213).',u:'u4',pub:true}]});
+  P('p2',o1,'c2','u3',{alias:'Ordinario laboral Herrera',radicado:'47001310500220240019800',jurisdiccion:'Ordinaria',especialidad:'Laboral',clase:'Ordinario laboral de primera instancia',despacho:'Juzgado 2.º Laboral del Circuito de Santa Marta',ciudad:'Santa Marta',demandante:'José Manuel Herrera Vives',demandado:'Transportes Rápidos del Magdalena S.A.',rolCliente:'Demandante',etapa:'Audiencia de conciliación y fijación del litigio (art. 77)',cuantia:85000000,fechaInicio:d(-300),ultimaRevision:d(-12),honorarios:{modalidad:'Cuota litis',valor:1500000,porcentaje:25},
+    actuaciones:[{f:d(-300),t:'Presentación de la demanda.',u:'u3',pub:true},{f:d(-210),t:'Contestación de la demandada con excepciones.',u:'u4',pub:true},{f:d(-30),t:'Auto fija fecha de audiencia del art. 77 CPTSS.',u:'u4',pub:true}]});
+  P('p3',o1,'c4','u2',{alias:'Nulidad sanción DIAN',radicado:'47001233300020250008700',jurisdiccion:'Contencioso administrativa',especialidad:'Administrativo',clase:'Nulidad y restablecimiento del derecho (tributario)',despacho:'Tribunal Administrativo del Magdalena',ciudad:'Santa Marta',demandante:'Distribuidora del Caribe Ltda.',demandado:'DIAN',rolCliente:'Demandante',etapa:'Admisión',cuantia:310000000,fechaInicio:d(-40),ultimaRevision:d(-9),sistema:'SAMAI',honorarios:{modalidad:'Por etapas',valor:24000000,porcentaje:0},
+    actuaciones:[{f:d(-40),t:'Radicación de la demanda en SAMAI.',u:'u2',pub:true},{f:d(-3),t:'Auto admite la demanda; notificación electrónica a la DIAN y al Ministerio Público.',u:'u4',pub:true}]});
+  P('p4',o1,'c3','u3',{alias:'Tutela salud Cantillo',radicado:'47001400300720260031100',jurisdiccion:'Constitucional',especialidad:'Tutela',clase:'Acción de tutela – derecho a la salud',despacho:'Juzgado 7.º Civil Municipal de Santa Marta',ciudad:'Santa Marta',demandante:'María Alejandra Cantillo',demandado:'EPS del Caribe',rolCliente:'Accionante',etapa:'Fallo de primera instancia',cuantia:0,fechaInicio:d(-14),ultimaRevision:d(-1),sinVacancia:true,honorarios:{modalidad:'Suma fija',valor:1200000,porcentaje:0},
+    actuaciones:[{f:d(-14),t:'Presentación de la tutela.',u:'u3',pub:true},{f:d(-2),t:'Fallo niega la tutela. Notificado por correo.',u:'u4',pub:true}]});
+  P('p5',o1,'c1','u2',{alias:'Ejecutivo pagarés Sol y Mar',radicado:'47001310300120260005600',jurisdiccion:'Ordinaria',especialidad:'Civil',clase:'Ejecutivo singular de mayor cuantía',despacho:'Juzgado 1.º Civil del Circuito de Santa Marta',ciudad:'Santa Marta',demandante:'Inversiones Bahía Taganga S.A.S.',demandado:'Comercializadora Sol y Mar S.A.S.',rolCliente:'Demandante',etapa:'Mandamiento de pago / medidas cautelares',cuantia:180000000,fechaInicio:d(-70),ultimaRevision:d(-21),honorarios:{modalidad:'Porcentaje de lo recaudado',valor:0,porcentaje:15},
+    actuaciones:[{f:d(-70),t:'Demanda ejecutiva con solicitud de embargo de cuentas.',u:'u2',pub:true},{f:d(-45),t:'Mandamiento de pago y decreto de medidas cautelares.',u:'u4',pub:true}]});
+  P('p6',o1,'c5','u3',{alias:'Derecho de petición Pertuz',radicado:'',tipo:'Extrajudicial',jurisdiccion:'—',especialidad:'Administrativo',clase:'Derecho de petición ante Colpensiones',despacho:'Colpensiones – Santa Marta',ciudad:'Santa Marta',demandante:'Luis Carlos Pertuz',demandado:'Colpensiones',rolCliente:'Peticionario',etapa:'En espera de respuesta',cuantia:0,fechaInicio:d(-12),ultimaRevision:d(-4),sistema:'OTRO',honorarios:{modalidad:'Suma fija',valor:600000,porcentaje:0},
+    actuaciones:[{f:d(-12),t:'Radicación del derecho de petición (radicado interno 2026-118822).',u:'u3',pub:true}]});
+  P('p7',o1,'c2','u3',{alias:'Sucesión Herrera (terminado)',radicado:'47001311000120230011000',jurisdiccion:'Ordinaria',especialidad:'Familia',clase:'Sucesión intestada',despacho:'Juzgado 1.º de Familia de Santa Marta',ciudad:'Santa Marta',demandante:'José Manuel Herrera Vives',demandado:'—',rolCliente:'Heredero',etapa:'Sentencia aprobatoria de partición',estado:'Terminado',cuantia:120000000,fechaInicio:d(-600),ultimaRevision:d(-60),honorarios:{modalidad:'Suma fija',valor:7000000,porcentaje:0},
+    actuaciones:[{f:d(-80),t:'Sentencia aprobatoria del trabajo de partición.',u:'u3',pub:true}]});
+  P('p8',o2,'c6','u6',{alias:'Divorcio Barrios',radicado:'08001311000420260020100',jurisdiccion:'Ordinaria',especialidad:'Familia',clase:'Divorcio contencioso',despacho:'Juzgado 4.º de Familia de Barranquilla',ciudad:'Barranquilla',demandante:'Ana Sofía Barrios',demandado:'Pedro Luis Ríos',rolCliente:'Demandante',etapa:'Notificación',cuantia:0,fechaInicio:d(-20),ultimaRevision:d(-3),honorarios:{modalidad:'Suma fija',valor:4500000,porcentaje:0}});
+  // términos (se calculan con las reglas reales)
+  const T=(id,of,p,nombre,norma,fecha,cant,u,l2213,resp,estado='Pendiente')=>{const proc=db.procesos.find(x=>x.id===p);const oo=db.oficinas.find(x=>x.id===of);const opt={vacancia:oo.config.vacancia&&!proc.sinVacancia,semanaSanta:oo.config.semanaSanta&&!proc.sinVacancia,cierres:oo.config.cierres};const r=calcularTermino({fecha,cantidad:cant,unidad:u,ley2213:l2213,opt});db.terminos.push({id,oficinaId:of,procesoId:p,nombre,norma,fecha,cantidad:cant,unidad:u,ley2213:l2213,venc:r.venc,responsableId:resp,estado,creado:fecha})};
+  T('t1',o1,'p4','Impugnación del fallo de tutela','Decreto 2591/1991 art. 31',d(-2),3,'h',false,'u3');
+  T('t2',o1,'p3','Traslado para contestar la demanda (seguimiento)','CPACA art. 172',d(-3),30,'h',true,'u2');
+  T('t3',o1,'p1','Contestación demanda – verbal sumario (contraparte)','CGP art. 391',d(-6),10,'h',true,'u2');
+  T('t4',o1,'p6','Respuesta a derecho de petición (general)','Ley 1755/2015 art. 14',d(-12),15,'h',false,'u3');
+  T('t5',o1,'p5','Cumplir carga procesal (evitar desistimiento tácito)','CGP art. 317',d(-38),30,'h',false,'u4');
+  T('t6',o1,'p2','Recurso de reposición contra auto','CGP art. 318',d(-30),3,'h',false,'u3','Cumplido');
+  T('t7',o2,'p8','Subsanar demanda inadmitida','CGP art. 90',d(-1),5,'h',false,'u6');
+  const A=(id,of,p,tipo,titulo,fecha,hora,lugar,u)=>db.agenda.push({id,oficinaId:of,procesoId:p,tipo,titulo,fecha,hora,lugar,userId:u});
+  A('a1',o1,'p2','Audiencia','Audiencia art. 77 CPTSS – conciliación y fijación del litigio',sigHabil(d(3),{vacancia:true,semanaSanta:true,cierres:[]}),'09:00','Virtual – Microsoft Teams (enlace del juzgado)','u3');
+  A('a2',o1,'p1','Audiencia','Audiencia inicial art. 372 CGP',sigHabil(d(23),{vacancia:true,semanaSanta:true,cierres:[]}),'14:30','Juzgado 3.º Pequeñas Causas – Lifesize','u2');
+  A('a3',o1,'p3','Reunión','Reunión con gerente de Distribuidora del Caribe (pruebas contables)',sigHabil(d(2),{vacancia:true,semanaSanta:true,cierres:[]}),'10:00','Oficina','u2');
+  A('a4',o1,'p5','Diligencia','Diligencia de secuestro de bienes',sigHabil(d(12),{vacancia:true,semanaSanta:true,cierres:[]}),'08:00','Bodega Zona Industrial','u4');
+  A('a5',o1,null,'Cita','Primera consulta – posible cliente (sucesión)',sigHabil(d(1),{vacancia:true,semanaSanta:true,cierres:[]}),'16:00','Oficina','u1');
+  A('a6',o2,'p8','Cita','Firma de poder con la clienta',d(2),'11:00','Oficina','u6');
+  const K=(id,of,p,titulo,u,f,hecha=false)=>db.tareas.push({id,oficinaId:of,procesoId:p,titulo,userId:u,fecha:f,hecha});
+  K('k1',o1,'p4','Redactar y radicar escrito de impugnación de la tutela','u3',d(1));
+  K('k2',o1,'p2','Preparar interrogatorio de parte y testigos para audiencia','u3',d(4));
+  K('k3',o1,'p5','Revisar respuesta de bancos a oficios de embargo','u4',d(-2));
+  K('k4',o1,'p3','Solicitar certificaciones contables al cliente','u2',d(3));
+  K('k5',o1,'p1','Verificar acuse de recibo de la notificación electrónica','u4',d(0),true);
+  // cobros (cuentas de cobro)
+  const B=(id,of,cli,p,numero,fecha,venc,concepto,valor,iva)=>db.cobros.push({id,oficinaId:of,clienteId:cli,procesoId:p,numero,fecha,venc,concepto,valor,iva});
+  B('b1',o1,'c1','p1','CC-0001',d(-90),d(-60),'Honorarios restitución – cuota 1 de 3',3000000,true);
+  B('b2',o1,'c1','p1','CC-0002',d(-45),d(-15),'Honorarios restitución – cuota 2 de 3',3000000,true);
+  B('b3',o1,'c4','p3','CC-0003',d(-40),d(-10),'Honorarios etapa 1: estudio y presentación de la demanda',8000000,true);
+  B('b4',o1,'c3','p4','CC-0004',d(-14),d(1),'Honorarios acción de tutela',1200000,false);
+  B('b5',o1,'c2','p2','CC-0005',d(-100),d(-70),'Gastos y honorarios iniciales proceso laboral',1500000,false);
+  B('b6',o1,'c5','p6','CC-0006',d(-12),d(18),'Elaboración y radicación de derecho de petición',600000,false);
+  B('b7',o2,'c6','p8','CC-0001',d(-20),d(10),'Honorarios divorcio – anticipo 50%',2250000,false);
+  const Pg=(id,cob,fecha,valor,medio)=>db.pagos.push({id,cobroId:cob,fecha,valor,medio});
+  Pg('g1','b1',d(-80),3570000,'Transferencia');Pg('g2','b3',d(-20),4000000,'Transferencia');Pg('g3','b5',d(-95),1500000,'Efectivo');
+  db.gastos.push({id:'x1',oficinaId:o1,procesoId:'p5',fecha:d(-44),concepto:'Arancel judicial y copias para oficios de embargo',valor:85000,reembolsable:true},{id:'x2',oficinaId:o1,procesoId:'p5',fecha:d(-30),concepto:'Honorarios de secuestre (anticipo)',valor:450000,reembolsable:true},{id:'x3',oficinaId:o1,procesoId:'p1',fecha:d(-58),concepto:'Envío certificado de citación (empresa de mensajería)',valor:18000,reembolsable:true});
+  return db;
+}
+
+// ---------- cálculos de negocio ----------
+const totalCobro=b=>Math.round(b.valor*(b.iva?1.19:1));
+const pagadoCobro=b=>DB.pagos.filter(p=>p.cobroId===b.id).reduce((s,p)=>s+p.valor,0);
+const saldoCobro=b=>Math.max(0,totalCobro(b)-pagadoCobro(b));
+function estadoCobro(b){const s=saldoCobro(b);if(s<=0)return ['Pagada','p-ver'];if(b.venc<HOY)return ['Vencida','p-rojo'];if(pagadoCobro(b)>0)return ['Abono parcial','p-amb'];return ['Pendiente','p-azul']}
+function semaforoTermino(t){
+  if(t.estado==='Cumplido')return {c:'p-ver',d:'d-ver',txt:'Cumplido',h:null};
+  const p=byId('procesos',t.procesoId);const h=habilesEntre(HOY,t.venc,optOf(p));
+  if(t.venc<HOY)return {c:'p-rojo',d:'d-rojo',txt:'Vencido',h};
+  if(t.venc===HOY)return {c:'p-rojo',d:'d-rojo',txt:'Vence HOY',h:0};
+  if(h<=2)return {c:'p-rojo',d:'d-rojo',txt:h+' día'+(h===1?'':'s')+' háb.',h};
+  if(h<=5)return {c:'p-amb',d:'d-amb',txt:h+' días háb.',h};
+  return {c:'p-ver',d:'d-ver',txt:h+' días háb.',h};
+}
+function visibles(col){ // abogados ven lo suyo + todo lo de la oficina (ver), dependiente todo; cliente solo lo propio
+  let r=de(col);
+  if(S.user.rol==='cliente'){const cid=S.user.clienteId;if(col==='procesos')r=r.filter(p=>p.clienteId===cid);if(col==='cobros')r=r.filter(b=>b.clienteId===cid);if(col==='agenda'){const ps=de('procesos').filter(p=>p.clienteId===cid).map(p=>p.id);r=r.filter(a=>ps.includes(a.procesoId)&&a.tipo!=='Reunión interna')}}
+  return r;
+}
+function alertas(){
+  const L=[];const o=OF();
+  de('terminos').filter(t=>t.estado!=='Cumplido').forEach(t=>{const s=semaforoTermino(t);if(t.venc<=addD(HOY,10)||s.c!=='p-ver')L.push({n:s.c==='p-rojo'?1:2,dot:s.d,t:(t.venc<HOY?'Término VENCIDO: ':'Término: ')+t.nombre,s:procTxt(byId('procesos',t.procesoId))+' · vence '+fDia(t.venc)+' · '+t.norma,ir:['terminos']})});
+  de('agenda').filter(a=>a.fecha>=HOY&&a.fecha<=addD(HOY,7)).forEach(a=>L.push({n:a.fecha===HOY?1:2,dot:a.tipo==='Audiencia'?'d-azul':'d-amb',t:a.tipo+': '+a.titulo,s:fDia(a.fecha)+' '+a.hora+' · '+a.lugar,ir:['agenda']}));
+  de('procesos').filter(p=>p.estado==='Activo'&&diffD(p.ultimaRevision||p.fechaInicio,HOY)>7).forEach(p=>L.push({n:3,dot:'d-amb',t:'Vigilancia: revisar estado del proceso',s:procTxt(p)+' · última revisión hace '+diffD(p.ultimaRevision||p.fechaInicio,HOY)+' días',ir:['procesos',p.id]}));
+  de('tareas').filter(k=>!k.hecha&&k.fecha<=addD(HOY,1)).forEach(k=>L.push({n:k.fecha<HOY?1:3,dot:k.fecha<HOY?'d-rojo':'d-amb',t:(k.fecha<HOY?'Tarea atrasada: ':'Tarea: ')+k.titulo,s:nomUser(k.userId)+' · '+fDia(k.fecha),ir:['tareas']}));
+  if(['admin','contable'].includes(S.user.rol))de('cobros').filter(b=>saldoCobro(b)>0&&b.venc<HOY).forEach(b=>L.push({n:3,dot:'d-rojo',t:'Cuenta de cobro vencida '+b.numero+' – '+cop(saldoCobro(b)),s:nomCli(b.clienteId)+' · venció '+fDia(b.venc),ir:['cobros']}));
+  de('clientes').filter(c=>!c.habeas).forEach(c=>L.push({n:4,dot:'d-amb',t:'Falta autorización de tratamiento de datos (Ley 1581/2012)',s:c.nombre,ir:['clientes',c.id]}));
+  return L.sort((a,b)=>a.n-b.n);
+}
+// ===================== DiligencIA · interfaz =====================
+function toast(m){const t=$('#toast');t.innerHTML='<div class="toast" role="status">'+esc(m)+'</div>';clearTimeout(toast._t);toast._t=setTimeout(()=>t.innerHTML='',2600)}
+function cerrar(){$('#modal').innerHTML=''}
+function modal(titulo,html,pie='',ancho=false){$('#modal').innerHTML='<div class="modal" onclick="if(event.target===this)cerrar()"><div class="box'+(ancho?' ancho':'')+'" role="dialog" aria-label="'+esc(titulo)+'"><div class="mh"><h3>'+esc(titulo)+'</h3><button class="x" onclick="cerrar()" aria-label="Cerrar">×</button></div>'+html+(pie?'<div class="mf">'+pie+'</div>':'')+'</div></div>'}
+function ir(v,sub){S.vista=v;S.sub=sub||{};render();window.scrollTo(0,0)}
+function copiar(txt,msg){const ok=()=>toast(msg||'Copiado');try{navigator.clipboard.writeText(txt).then(ok).catch(()=>fallback())}catch(e){fallback()}function fallback(){const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');ok()}catch(e){toast('Seleccione y copie el texto manualmente')}ta.remove()}}
+const waLink=(tel,txt)=>'https://wa.me/57'+String(tel||'').replace(/\D/g,'').slice(-10)+'?text='+encodeURIComponent(txt);
+const puede=(...r)=>r.includes(S.user.rol);
+
+// ---------- formularios genéricos ----------
+function campo(f,v){
+  const id='fx_'+f.k;const val=v??f.def??'';const req=f.req?' required':'';
+  let inp;
+  if(f.type==='select')inp='<select id="'+id+'" name="'+f.k+'"'+req+'>'+f.opts.map(o=>{const [ov,ol]=Array.isArray(o)?o:[o,o];return '<option value="'+esc(ov)+'"'+(String(ov)===String(val)?' selected':'')+'>'+esc(ol)+'</option>'}).join('')+'</select>';
+  else if(f.type==='textarea')inp='<textarea id="'+id+'" name="'+f.k+'"'+req+'>'+esc(val)+'</textarea>';
+  else if(f.type==='check')return '<label class="chk'+(f.full?' full':'')+'"><input type="checkbox" id="'+id+'" name="'+f.k+'"'+(val?' checked':'')+'> '+esc(f.l)+'</label>';
+  else inp='<input id="'+id+'" name="'+f.k+'" type="'+(f.type||'text')+'" value="'+esc(val)+'"'+req+(f.ph?' placeholder="'+esc(f.ph)+'"':'')+(f.type==='number'?' min="0" step="any"':'')+'>';
+  return '<label'+(f.full?' class="full"':'')+'>'+esc(f.l)+inp+(f.help?'<span class="small muted" style="font-weight:400">'+f.help+'</span>':'')+'</label>';
+}
+let _onSave=null;
+function formModal(titulo,campos,obj,onSave,extra=''){
+  _onSave=onSave;
+  modal(titulo,'<form class="f" id="fm" onsubmit="event.preventDefault();enviarForm()">'+campos.map(f=>campo(f,obj?obj[f.k]:undefined)).join('')+extra+'</form>','<button class="btn" onclick="cerrar()">Cancelar</button><button class="btn pri" onclick="enviarForm()">Guardar</button>');
+}
+function enviarForm(){const fm=$('#fm');if(!fm.reportValidity())return;const d={};[...fm.elements].forEach(el=>{if(!el.name)return;d[el.name]=el.type==='checkbox'?el.checked:(el.type==='number'?num(el.value):el.value.trim())});const r=_onSave(d);if(r!==false){guardar();cerrar();render()}}
+
+// ---------- marco general ----------
+function render(){
+  const app=$('#app');
+  if(!S.user){app.innerHTML=vLogin();return}
+  const o=OF();const menu=ROLES[S.user.rol].menu;if(!menu.includes(S.vista))S.vista=menu[0];
+  const nAl=S.user.rol==='cliente'?0:alertas().filter(a=>a.n<=2).length;
+  const logo=o.logo?'<img class="ofi-logo" src="'+o.logo+'" alt="">':'';
+  app.innerHTML='<header class="top"><div class="brand">'+LOGO_SG+'<div class="bt">DiligencIA<small>SKYNET GENESIS</small></div></div><div class="ofi">'+logo+'<div style="min-width:0"><div class="ofi-name">'+esc(o.nombre)+'</div><div class="ofi-user">'+esc(S.user.nombre)+' · '+ROLES[S.user.rol].n+'</div></div><button class="salir" onclick="salir()">Salir</button></div></header>'
+   +'<div class="shell"><nav class="menu" aria-label="Menú principal">'+menu.map(m=>'<button class="'+(S.vista===m?'on':'')+'" onclick="ir(\''+m+'\')">'+MENU[m]+(m==='inicio'&&nAl?'<span class="cnt">'+nAl+'</span>':'')+'</button>').join('')+'</nav><main id="main">'+(VISTAS[S.vista]||VISTAS.inicio)()+'</main></div>';
+}
+function salir(){S.user=null;S.vista='inicio';render()}
+function vLogin(){
+  const ofs=DB.oficinas;
+  return '<div class="login"><div class="box"><div class="brand" style="color:var(--fg)">'+LOGO_SG.replace('<svg','<svg style="width:52px;height:52px"')+'<div class="bt" style="font-size:30px">DiligencIA<small>SKYNET GENESIS</small></div></div>'
+  +'<p class="muted" style="margin:12px 0 4px">Control integral de la oficina jurídica: clientes, procesos, términos judiciales, audiencias, alertas y honorarios, con el calendario judicial colombiano.</p>'
+  +'<div class="f" style="margin-top:14px"><label>Oficina o firma (demostración)<select id="lg_of">'+ofs.map(o=>'<option value="'+o.id+'">'+esc(o.nombre)+'</option>').join('')+'</select></label></div>'
+  +'<h4 style="margin-top:16px">Probar la demostración como:</h4><div class="roles">'+Object.entries(ROLES).map(([k,r])=>'<button onclick="entrar(\''+k+'\')"><b>'+r.n+'</b><span>'+r.d+'</span></button>').join('')+'</div>'
+  +'<p class="small muted" style="margin-top:16px">Versión de prueba con datos de ejemplo. En la versión publicada cada usuario entra con su correo y contraseña. Soporte: '+SG.correo+' · WhatsApp 304 437 5758</p></div></div>';
+}
+function entrar(rol){
+  const lg=$('#lg_of');S.of=lg?lg.value:(S.of||DB.oficinas[0].id);
+  if(rol==='cliente'){const c=de('clientes')[0];S.user={id:'portal',rol:'cliente',clienteId:c.id,nombre:c.nombre}}
+  else{let u=de('users').find(x=>x.rol===rol&&x.activo);if(!u)u=de('users').find(x=>x.rol==='admin');S.user=Object.assign({},u,{rol})}
+  S.vista=ROLES[rol].menu[0];render();
+}
+
+// ---------- piezas ----------
+const pill=(t,c)=>'<span class="pill '+c+'">'+esc(t)+'</span>';
+const kpi=(l,k,s,cl='')=>'<div class="card kpi '+cl+'"><div class="l">'+l+'</div><div class="k num">'+k+'</div><div class="s">'+(s||'&nbsp;')+'</div></div>';
+const head=(t,p,acc='')=>'<div class="head"><div><h2>'+t+'</h2>'+(p?'<p>'+p+'</p>':'')+'</div><div class="acc">'+acc+'</div></div>';
+function fechaBox(s){const d=pd(s);return '<div class="fecha">'+MES3[d.getMonth()]+'<b>'+d.getDate()+'</b></div>'}
+function radHTML(r){if(!r)return '<span class="muted">Sin radicado</span>';if(r.length!==23)return '<span class="rad">'+esc(r)+'</span>';const seg=[r.slice(0,2),r.slice(2,5),r.slice(5,7),r.slice(7,9),r.slice(9,12),r.slice(12,16),r.slice(16,21),r.slice(21)];return '<span class="rad" title="Depto · Municipio · Entidad · Especialidad · Despacho · Año · Consecutivo · Recurso">'+seg.map(s=>'<span>'+s+'</span>').join('')+'</span>'}
+function selProc(id,val,todos=true){return '<select id="'+id+'">'+(todos?'<option value="">— Sin proceso —</option>':'')+de('procesos').filter(p=>p.estado!=='Terminado'||p.id===val).map(p=>'<option value="'+p.id+'"'+(p.id===val?' selected':'')+'>'+esc(procTxt(p)+' · '+nomCli(p.clienteId))+'</option>').join('')+'</select>'}
+const optsUsers=(roles)=>de('users').filter(u=>u.activo&&(!roles||roles.includes(u.rol))).map(u=>[u.id,u.nombre]);
+const optsCli=()=>de('clientes').map(c=>[c.id,c.nombre]);
+const optsProc=(vacio=true)=>(vacio?[['','— Sin proceso —']]:[]).concat(de('procesos').map(p=>[p.id,procTxt(p)+' · '+nomCli(p.clienteId)]));
+
+// ===================== VISTAS =====================
+const VISTAS={};
+
+VISTAS.inicio=()=>{
+  const r=S.user.rol;const al=alertas();
+  const procs=de('procesos').filter(p=>p.estado==='Activo');
+  const terms=de('terminos').filter(t=>t.estado!=='Cumplido').sort((a,b)=>a.venc<b.venc?-1:1);
+  const crit=terms.filter(t=>['p-rojo','p-amb'].includes(semaforoTermino(t).c));
+  const ag=de('agenda').filter(a=>a.fecha>=HOY).sort((a,b)=>(a.fecha+a.hora)<(b.fecha+b.hora)?-1:1);
+  const aud7=ag.filter(a=>a.tipo==='Audiencia'&&a.fecha<=addD(HOY,7));
+  const cob=de('cobros');const cartera=cob.reduce((s,b)=>s+saldoCobro(b),0);const venc=cob.filter(b=>b.venc<HOY).reduce((s,b)=>s+saldoCobro(b),0);
+  const mes=HOY.slice(0,7);const rec=DB.pagos.filter(p=>cob.some(b=>b.id===p.cobroId)&&p.fecha.startsWith(mes)).reduce((s,p)=>s+p.valor,0);
+  let k='';
+  if(r==='contable')k=kpi('Cartera por cobrar',cop(cartera),cob.filter(b=>saldoCobro(b)>0).length+' cuentas abiertas')+kpi('Cartera vencida',cop(venc),'requiere gestión de cobro',venc?'peligro':'')+kpi('Recaudado este mes',cop(rec),MESES[new Date().getMonth()])+kpi('Clientes',de('clientes').length,'registrados');
+  else k=kpi('Procesos activos',procs.length,de('procesos').filter(p=>p.tipo==='Extrajudicial'&&p.estado==='Activo').length+' asunto(s) extrajudicial(es)')+kpi('Términos en alerta',crit.length,'≤ 5 días hábiles o vencidos',crit.length?'peligro':'')+kpi('Audiencias 7 días',aud7.length,aud7[0]?'próxima: '+fDia(aud7[0].fecha):'sin audiencias',aud7.length?'alerta':'')+(r==='admin'?kpi('Cartera por cobrar',cop(cartera),'vencida: '+cop(venc),venc?'alerta':''):kpi('Tareas pendientes',de('tareas').filter(t=>!t.hecha).length,'del equipo'));
+  const hoyTxt=DIAS[new Date().getDay()]+' '+fLarga(HOY);const mi=motivoInhabil(HOY,optOf());
+  return head('Hola, '+esc(S.user.nombre.split(' ')[0]),hoyTxt+(mi?' · '+pill('Día inhábil: '+mi,'p-amb'):' · '+pill('Día hábil judicial','p-ver')))
+   +'<div class="grid g4">'+k+'</div>'
+   +'<div class="grid g2" style="margin-top:14px"><div class="card"><h3>Alertas de seguimiento</h3><div class="list">'+(al.length?al.slice(0,9).map(a=>'<div class="li"><span class="dot '+a.dot+'"></span><div class="grow"><b>'+esc(a.t)+'</b><div class="small muted">'+esc(a.s)+'</div></div><button class="btn peq" onclick="ir(\''+a.ir[0]+'\''+(a.ir[1]?',{id:\''+a.ir[1]+'\'}':'')+')">Ver</button></div>').join(''):'<div class="empty">Sin alertas. Todo al día.</div>')+(al.length>9?'<p class="small muted">y '+(al.length-9)+' alertas más de menor prioridad.</p>':'')+'</div></div>'
+   +'<div class="card"><h3>Próximos compromisos</h3><div class="list">'+(ag.slice(0,6).map(a=>'<div class="li">'+fechaBox(a.fecha)+'<div class="grow"><b>'+esc(a.titulo)+'</b><div class="small muted">'+esc(a.tipo)+' · '+fDia(a.fecha)+' '+esc(a.hora)+' · '+esc(a.lugar)+'</div><div class="small muted">'+esc(nomUser(a.userId))+'</div></div></div>').join('')||'<div class="empty">Sin compromisos próximos</div>')+'</div></div></div>'
+   +(r!=='contable'?'<div class="card" style="margin-top:14px"><h3>Términos pendientes</h3><p class="small muted" style="margin:2px 0 10px">Semáforo en días hábiles judiciales restantes.</p>'+tablaTerminos(terms.slice(0,6))+'</div>':'');
+};
+
+// ---------- clientes ----------
+VISTAS.clientes=()=>{
+  if(S.sub.id)return detalleCliente(S.sub.id);
+  const q=(S.sub.q||'').toLowerCase();
+  const L=de('clientes').filter(c=>!q||(c.nombre+c.doc+c.email+c.tel).toLowerCase().includes(q));
+  return head('Clientes',de('clientes').length+' clientes registrados',puede('admin','abogado')?'<button class="btn pri" onclick="editarCliente()">+ Nuevo cliente</button>':'')
+   +'<div class="toolbar"><input type="search" id="q_cli" placeholder="Buscar por nombre, documento, correo o teléfono" value="'+esc(S.sub.q||'')+'" oninput="S.sub.q=this.value;buscarEn(\'q_cli\')"></div>'
+   +'<div class="tw"><table><thead><tr><th>Cliente</th><th>Documento</th><th>Contacto</th><th>Procesos</th><th>Saldo</th><th>Datos personales</th></tr></thead><tbody>'
+   +(L.map(c=>{const ps=de('procesos').filter(p=>p.clienteId===c.id);const sal=de('cobros').filter(b=>b.clienteId===c.id).reduce((s,b)=>s+saldoCobro(b),0);return '<tr class="click" onclick="ir(\'clientes\',{id:\''+c.id+'\'})"><td><b>'+esc(c.nombre)+'</b><div class="small muted">'+esc(c.tipo==='Jurídica'?'Persona jurídica':'Persona natural')+'</div></td><td class="num">'+esc(c.doc)+'</td><td class="small">'+esc(c.tel)+'<br>'+esc(c.email)+'</td><td class="num">'+ps.filter(p=>p.estado==='Activo').length+' activos</td><td class="num">'+(sal?cop(sal):'<span class="muted">—</span>')+'</td><td>'+(c.habeas?pill('Autorizado','p-ver'):pill('Sin autorización','p-rojo'))+'</td></tr>'}).join('')||'<tr><td colspan="6" class="empty">No hay clientes con esa búsqueda</td></tr>')+'</tbody></table></div>';
+};
+function buscarEn(id){const el=$('#'+id);const pos=el.selectionStart;render();const n=$('#'+id);if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}}
+function detalleCliente(id){
+  const c=byId('clientes',id);if(!c)return '';
+  const ps=de('procesos').filter(p=>p.clienteId===id);const bs=de('cobros').filter(b=>b.clienteId===id);
+  return head(esc(c.nombre),esc(c.doc)+' · cliente desde '+fCorta(c.creado),'<button class="btn" onclick="ir(\'clientes\')">← Clientes</button>'+(puede('admin','abogado')?'<button class="btn" onclick="editarCliente(\''+id+'\')">Editar</button><button class="btn pri" onclick="editarProceso(null,\''+id+'\')">+ Proceso o asunto</button>':'')+'<a class="btn wa" target="_blank" rel="noopener" href="'+waLink(c.tel,'Buen día, '+c.nombre.split(' ')[0]+'. Le escribimos de '+OF().nombre+'.')+'">WhatsApp</a>')
+  +'<div class="grid g2"><div class="card"><h3>Datos del cliente</h3><dl class="kv" style="margin-top:10px"><dt>Tipo</dt><dd>'+esc(c.tipo)+'</dd><dt>Documento</dt><dd>'+esc(c.doc)+'</dd>'+(c.contacto?'<dt>Contacto</dt><dd>'+esc(c.contacto)+'</dd>':'')+'<dt>Teléfono</dt><dd>'+esc(c.tel)+'</dd><dt>Correo</dt><dd>'+esc(c.email)+'</dd><dt>Canal digital para notificaciones</dt><dd>'+esc(c.canal||c.email)+' <span class="small muted">(Ley 2213/2022, art. 6)</span></dd><dt>Dirección</dt><dd>'+esc(c.dir)+'</dd><dt>Tratamiento de datos</dt><dd>'+(c.habeas?pill('Autorizado el '+fCorta(c.habeasFecha),'p-ver'):pill('Pendiente','p-rojo')+' <button class="btn peq" onclick="docAutorizacion(\''+id+'\')">Generar autorización</button>')+'</dd>'+(c.notas?'<dt>Notas</dt><dd>'+esc(c.notas)+'</dd>':'')+'</dl></div>'
+  +'<div class="card"><h3>Cuenta del cliente</h3>'+(bs.length?'<div class="tw" style="margin-top:10px"><table><thead><tr><th>N.º</th><th>Concepto</th><th>Saldo</th><th>Estado</th></tr></thead><tbody>'+bs.map(b=>{const e=estadoCobro(b);return '<tr><td>'+esc(b.numero)+'</td><td class="small">'+esc(b.concepto)+'</td><td class="num">'+cop(saldoCobro(b))+'</td><td>'+pill(e[0],e[1])+'</td></tr>'}).join('')+'</tbody></table></div>':'<div class="empty">Sin cuentas de cobro</div>')+'</div></div>'
+  +'<h3 style="margin:18px 0 10px">Procesos y asuntos</h3>'+tablaProcesos(ps);
+}
+function editarCliente(id){
+  const c=id?byId('clientes',id):null;
+  formModal(c?'Editar cliente':'Nuevo cliente',[
+    {k:'nombre',l:'Nombre o razón social',req:1,full:1},{k:'tipo',l:'Tipo de persona',type:'select',opts:['Natural','Jurídica']},{k:'doc',l:'Documento (CC / NIT)',req:1,ph:'CC 12.345.678'},
+    {k:'tel',l:'Celular / WhatsApp',req:1},{k:'email',l:'Correo electrónico',type:'email',req:1},{k:'canal',l:'Canal digital para notificaciones',help:'Correo que se informa al despacho (Ley 2213, art. 6)'},{k:'contacto',l:'Persona de contacto (si es empresa)'},{k:'dir',l:'Dirección',full:1},
+    {k:'habeas',l:'El cliente autorizó el tratamiento de sus datos personales (Ley 1581 de 2012)',type:'check',full:1},{k:'notas',l:'Notas internas',type:'textarea',full:1}],c,d=>{
+      if(d.habeas&&!(c&&c.habeas))d.habeasFecha=HOY; if(!d.canal)d.canal=d.email;
+      if(c)Object.assign(c,d);else{const n=Object.assign({id:uid(),oficinaId:S.of,creado:HOY},d);DB.clientes.push(n);S.sub={id:n.id};S.vista='clientes'}toast('Cliente guardado')});
+}
+
+// ---------- procesos ----------
+function tablaProcesos(L){
+  return '<div class="tw"><table><thead><tr><th>Proceso / asunto</th><th>Radicado</th><th>Cliente</th><th>Etapa</th><th>Responsable</th><th>Última revisión</th></tr></thead><tbody>'+(L.map(p=>{const dr=diffD(p.ultimaRevision||p.fechaInicio,HOY);return '<tr class="click" onclick="ir(\'procesos\',{id:\''+p.id+'\'})"><td><b>'+esc(p.alias||p.clase)+'</b><div class="small muted">'+esc(p.especialidad)+' · '+esc(p.despacho)+'</div>'+(p.estado!=='Activo'?pill(p.estado,'p-gris'):'')+'</td><td>'+radHTML(p.radicado)+'</td><td class="small">'+esc(nomCli(p.clienteId))+'<div class="muted">'+esc(p.rolCliente)+'</div></td><td class="small">'+esc(p.etapa)+'</td><td class="small">'+esc(nomUser(p.abogadoId))+'</td><td>'+(p.estado==='Activo'?pill(dr===0?'Hoy':'Hace '+dr+' d',dr>7?'p-amb':'p-ver'):'<span class="muted small">—</span>')+'</td></tr>'}).join('')||'<tr><td colspan="6" class="empty">Sin procesos</td></tr>')+'</tbody></table></div>';
+}
+VISTAS.procesos=()=>{
+  if(S.sub.id)return detalleProceso(S.sub.id);
+  const f=S.sub;const q=(f.q||'').toLowerCase();
+  let L=de('procesos').filter(p=>(!q||(p.alias+p.radicado+p.clase+p.despacho+p.demandante+p.demandado+nomCli(p.clienteId)).toLowerCase().includes(q))&&(!f.est||p.estado===f.est)&&(!f.esp||p.especialidad===f.esp)&&(!f.ab||p.abogadoId===f.ab));
+  if(f.mios)L=L.filter(p=>p.abogadoId===S.user.id);
+  const esp=[...new Set(de('procesos').map(p=>p.especialidad))];
+  return head('Procesos y asuntos','Judiciales y extrajudiciales. Vigile cada proceso en el sistema de consulta de la Rama Judicial y registre la revisión.',puede('admin','abogado')?'<button class="btn pri" onclick="editarProceso()">+ Nuevo proceso</button>':'')
+  +'<div class="toolbar"><input type="search" id="q_pro" placeholder="Buscar por radicado, partes, despacho o cliente" value="'+esc(f.q||'')+'" oninput="S.sub.q=this.value;buscarEn(\'q_pro\')">'
+  +'<select onchange="S.sub.est=this.value;render()" aria-label="Estado"><option value="">Todos los estados</option>'+['Activo','Suspendido','Terminado'].map(x=>'<option'+(f.est===x?' selected':'')+'>'+x+'</option>').join('')+'</select>'
+  +'<select onchange="S.sub.esp=this.value;render()" aria-label="Especialidad"><option value="">Todas las especialidades</option>'+esp.map(x=>'<option'+(f.esp===x?' selected':'')+'>'+esc(x)+'</option>').join('')+'</select>'
+  +'<select onchange="S.sub.ab=this.value;render()" aria-label="Responsable"><option value="">Todos los responsables</option>'+optsUsers(['admin','abogado']).map(([v,l])=>'<option value="'+v+'"'+(f.ab===v?' selected':'')+'>'+esc(l)+'</option>').join('')+'</select></div>'
+  +tablaProcesos(L);
+};
+function detalleProceso(id){
+  const p=byId('procesos',id);if(!p)return '';const t=S.sub.tab||'res';const sis=SISTEMAS[p.sistema]||SISTEMAS.OTRO;
+  const tabs=[['res','Resumen'],['act','Actuaciones ('+p.actuaciones.length+')'],['ter','Términos'],['age','Agenda y tareas']].concat(puede('admin','abogado','contable')?[['hon','Honorarios y gastos']]:[]);
+  let body='';
+  if(t==='res')body='<div class="grid g2"><div class="card"><h3>Datos del proceso</h3><dl class="kv" style="margin-top:10px"><dt>Radicado</dt><dd>'+radHTML(p.radicado)+'</dd><dt>Tipo</dt><dd>'+esc(p.tipo)+'</dd><dt>Jurisdicción</dt><dd>'+esc(p.jurisdiccion)+' · '+esc(p.especialidad)+'</dd><dt>Clase</dt><dd>'+esc(p.clase)+'</dd><dt>Despacho / entidad</dt><dd>'+esc(p.despacho)+' ('+esc(p.ciudad)+')</dd><dt>Demandante</dt><dd>'+esc(p.demandante)+'</dd><dt>Demandado</dt><dd>'+esc(p.demandado)+'</dd><dt>Nuestro cliente</dt><dd>'+esc(nomCli(p.clienteId))+' ('+esc(p.rolCliente)+')</dd><dt>Cuantía</dt><dd class="num">'+(p.cuantia?cop(p.cuantia):'Sin cuantía')+'</dd><dt>Etapa</dt><dd>'+esc(p.etapa)+'</dd><dt>Estado</dt><dd>'+esc(p.estado)+'</dd><dt>Responsable</dt><dd>'+esc(nomUser(p.abogadoId))+'</dd><dt>Inicio</dt><dd>'+fLarga(p.fechaInicio)+'</dd>'+(p.sinVacancia?'<dt>Cómputo</dt><dd>'+pill('Corre en vacancia judicial (tutela / garantías)','p-amb')+'</dd>':'')+'</dl></div>'
+   +'<div class="card"><h3>Vigilancia judicial</h3><p class="small muted">Sistema de consulta: <b>'+esc(sis.n)+'</b></p><div class="toolbar" style="margin-top:8px">'+(sis.u?'<a class="btn pri" target="_blank" rel="noopener" href="'+sis.u+'">Abrir consulta oficial ↗</a>':'')+(p.radicado?'<button class="btn" onclick="copiar(\''+p.radicado+'\',\'Radicado copiado: péguelo en la consulta\')">Copiar radicado</button>':'')+'<button class="btn amb" onclick="revisado(\''+id+'\')">Marcar revisado hoy</button></div><p class="small">Última revisión: <b>'+fLarga(p.ultimaRevision||p.fechaInicio)+'</b> ('+diffD(p.ultimaRevision||p.fechaInicio,HOY)+' días). La app alerta cuando un proceso activo pasa más de 7 días sin revisión.</p><div class="note small">El radicado de 23 dígitos identifica departamento, municipio, entidad, especialidad, despacho, año, consecutivo y recurso. Si el despacho migró al SIUGJ, cambie el sistema de consulta en «Editar».</div>'
+   +'<h4 style="margin-top:14px">Última actuación</h4>'+(p.actuaciones.length?(()=>{const a=[...p.actuaciones].sort((x,y)=>x.f<y.f?1:-1)[0];return '<p class="small"><b>'+fCorta(a.f)+'</b> · '+esc(a.t)+'</p>'})():'<p class="small muted">Sin actuaciones</p>')+'</div></div>';
+  if(t==='act')body='<div class="toolbar">'+(S.user.rol!=='contable'?'<button class="btn pri" onclick="nuevaActuacion(\''+id+'\')">+ Registrar actuación</button>':'')+'<span class="small muted">Las actuaciones marcadas como visibles aparecen en el portal del cliente y en el informe de rendición de cuentas.</span></div><div class="card"><div class="list">'+([...p.actuaciones].sort((x,y)=>x.f<y.f?1:-1).map(a=>'<div class="li">'+fechaBox(a.f)+'<div class="grow">'+esc(a.t)+'<div class="small muted">'+esc(nomUser(a.u))+' · '+(a.pub?'visible para el cliente':'solo interna')+'</div></div></div>').join('')||'<div class="empty">Sin actuaciones</div>')+'</div></div>';
+  if(t==='ter'){const ts=de('terminos').filter(x=>x.procesoId===id);body='<div class="toolbar"><button class="btn pri" onclick="ir(\'terminos\',{proc:\''+id+'\'})">+ Calcular término para este proceso</button></div>'+tablaTerminos(ts)}
+  if(t==='age'){const as=de('agenda').filter(a=>a.procesoId===id).sort((a,b)=>a.fecha<b.fecha?-1:1);const ks=de('tareas').filter(k=>k.procesoId===id);body='<div class="grid g2"><div class="card"><div class="head" style="margin:0 0 6px"><h3>Agenda</h3><div class="acc"><button class="btn peq pri" onclick="editarEvento(null,\''+id+'\')">+ Evento</button></div></div><div class="list">'+(as.map(a=>'<div class="li">'+fechaBox(a.fecha)+'<div class="grow"><b>'+esc(a.titulo)+'</b><div class="small muted">'+esc(a.tipo)+' · '+esc(a.hora)+' · '+esc(a.lugar)+'</div></div></div>').join('')||'<div class="empty">Sin eventos</div>')+'</div></div><div class="card"><div class="head" style="margin:0 0 6px"><h3>Tareas</h3><div class="acc"><button class="btn peq pri" onclick="editarTarea(null,\''+id+'\')">+ Tarea</button></div></div>'+listaTareas(ks)+'</div></div>'}
+  if(t==='hon'){const h=p.honorarios||{};const bs=de('cobros').filter(b=>b.procesoId===id);const gs=de('gastos').filter(g=>g.procesoId===id);const fact=bs.reduce((s,b)=>s+totalCobro(b),0),pag=bs.reduce((s,b)=>s+pagadoCobro(b),0);
+    body='<div class="grid g4">'+kpi('Honorarios pactados',h.valor?cop(h.valor):(h.porcentaje?h.porcentaje+' %':'—'),esc(h.modalidad||''))+kpi('Facturado',cop(fact),bs.length+' cuentas de cobro')+kpi('Pagado',cop(pag),'')+kpi('Gastos del proceso',cop(gs.reduce((s,g)=>s+g.valor,0)),'reembolsables por el cliente')+'</div>'
+    +'<div class="toolbar" style="margin-top:12px">'+(puede('admin','contable')?'<button class="btn pri" onclick="editarCobro(null,\''+id+'\')">+ Cuenta de cobro</button><button class="btn" onclick="editarGasto(null,\''+id+'\')">+ Gasto</button>':'')+(puede('admin','abogado')?'<button class="btn" onclick="editarHonorarios(\''+id+'\')">Editar honorarios pactados</button><button class="btn" onclick="docContrato(\''+id+'\')">Contrato de servicios</button>':'')+'</div>'
+    +'<div class="grid g2"><div>'+tablaCobros(bs)+'</div><div class="tw"><table><thead><tr><th>Fecha</th><th>Gasto</th><th>Valor</th></tr></thead><tbody>'+(gs.map(g=>'<tr><td class="num">'+fCorta(g.fecha)+'</td><td class="small">'+esc(g.concepto)+'</td><td class="num">'+cop(g.valor)+'</td></tr>').join('')||'<tr><td colspan="3" class="empty">Sin gastos</td></tr>')+'</tbody></table></div></div>'}
+  return head(esc(p.alias||p.clase),esc(p.clase)+' · '+esc(nomCli(p.clienteId)),'<button class="btn" onclick="ir(\'procesos\')">← Procesos</button>'+(puede('admin','abogado')?'<button class="btn" onclick="editarProceso(\''+id+'\')">Editar</button>':'')+'<button class="btn" onclick="docInforme(\''+p.clienteId+'\')">Informe al cliente</button>'+(puede('admin','abogado')?'<button class="btn" onclick="docPoder(\''+id+'\')">Poder</button>':''))
+   +'<div class="tabs">'+tabs.map(([k,l])=>'<button class="'+(t===k?'on':'')+'" onclick="S.sub.tab=\''+k+'\';render()">'+l+'</button>').join('')+'</div>'+body;
+}
+function revisado(id){const p=byId('procesos',id);p.ultimaRevision=HOY;guardar();render();toast('Revisión registrada hoy')}
+function nuevaActuacion(id){formModal('Registrar actuación',[{k:'f',l:'Fecha',type:'date',def:HOY,req:1},{k:'t',l:'Descripción de la actuación',type:'textarea',req:1,full:1,ph:'Ej.: Auto que fija fecha de audiencia inicial'},{k:'pub',l:'Visible para el cliente en su portal',type:'check',def:true,full:1},{k:'rev',l:'Registrar también como revisión del proceso hoy',type:'check',def:true,full:1}],null,d=>{const p=byId('procesos',id);p.actuaciones.push({f:d.f,t:d.t,u:S.user.id,pub:d.pub});if(d.rev)p.ultimaRevision=HOY;toast('Actuación registrada')})}
+function editarProceso(id,cli){
+  const p=id?byId('procesos',id):{clienteId:cli,abogadoId:S.user.rol==='abogado'?S.user.id:'',fechaInicio:HOY,tipo:'Judicial',estado:'Activo',sistema:'CPNU',jurisdiccion:'Ordinaria'};
+  formModal(id?'Editar proceso':'Nuevo proceso o asunto',[
+   {k:'alias',l:'Nombre corto para identificarlo',req:1,ph:'Ej.: Restitución local Taganga'},{k:'tipo',l:'Tipo',type:'select',opts:['Judicial','Extrajudicial','Consultoría']},
+   {k:'clienteId',l:'Cliente',type:'select',opts:optsCli(),req:1},{k:'rolCliente',l:'Calidad del cliente',type:'select',opts:['Demandante','Demandado','Accionante','Accionado','Tercero interviniente','Víctima','Indiciado / procesado','Peticionario','Heredero','Consultante']},
+   {k:'radicado',l:'Radicado (23 dígitos)',ph:'47001310300120260005600',help:'Solo números. Déjelo vacío si aún no se ha radicado.'},{k:'sistema',l:'Sistema de consulta',type:'select',opts:Object.entries(SISTEMAS).map(([k,v])=>[k,v.n])},
+   {k:'jurisdiccion',l:'Jurisdicción',type:'select',opts:['Ordinaria','Contencioso administrativa','Constitucional','Penal','Disciplinaria','Especial para la Paz','Arbitral','—']},{k:'especialidad',l:'Especialidad',type:'select',opts:['Civil','Familia','Laboral','Comercial','Administrativo','Penal','Tutela','Tributario','Disciplinario','Otro']},
+   {k:'clase',l:'Clase de proceso o trámite',req:1,full:1,ph:'Ej.: Verbal – responsabilidad civil extracontractual'},{k:'despacho',l:'Despacho o entidad',req:1,full:1},{k:'ciudad',l:'Ciudad'},{k:'cuantia',l:'Cuantía / pretensiones ($)',type:'number'},
+   {k:'demandante',l:'Demandante / accionante'},{k:'demandado',l:'Demandado / accionado'},{k:'etapa',l:'Etapa actual'},{k:'estado',l:'Estado',type:'select',opts:['Activo','Suspendido','Terminado']},
+   {k:'abogadoId',l:'Abogado responsable',type:'select',opts:optsUsers(['admin','abogado']),req:1},{k:'fechaInicio',l:'Fecha de inicio',type:'date',req:1},
+   {k:'sinVacancia',l:'Los términos corren en vacancia judicial y Semana Santa (tutela, habeas corpus, juzgados de garantías)',type:'check',full:1}],p,d=>{
+     d.radicado=(d.radicado||'').replace(/\D/g,'');if(d.radicado&&d.radicado.length!==23){toast('El radicado debe tener 23 dígitos (tiene '+d.radicado.length+')');return false}
+     if(id)Object.assign(p,d);else{const n=Object.assign({id:uid(),oficinaId:S.of,actuaciones:[],honorarios:{modalidad:'Suma fija',valor:0,porcentaje:0},ultimaRevision:HOY},d);DB.procesos.push(n);S.vista='procesos';S.sub={id:n.id}}toast('Proceso guardado')});
+}
+function editarHonorarios(id){const p=byId('procesos',id);formModal('Honorarios pactados',[{k:'modalidad',l:'Modalidad',type:'select',opts:['Suma fija','Suma fija por cuotas','Por etapas','Cuota litis','Porcentaje de lo recaudado','Iguala mensual','Por hora']},{k:'valor',l:'Valor pactado ($)',type:'number'},{k:'porcentaje',l:'Porcentaje (cuota litis) %',type:'number',help:'La cuota litis no puede superar la participación del cliente (Ley 1123/2007 y jurisprudencia disciplinaria).'}],p.honorarios,d=>{p.honorarios=d;toast('Honorarios actualizados')})}
+
+// ---------- términos ----------
+function tablaTerminos(L){
+  return '<div class="tw"><table><thead><tr><th>Semáforo</th><th>Término</th><th>Proceso</th><th>Desde</th><th>Vence</th><th>Responsable</th><th></th></tr></thead><tbody>'+(L.map(t=>{const s=semaforoTermino(t);const p=byId('procesos',t.procesoId);return '<tr><td>'+pill(s.txt,s.c)+'</td><td><b>'+esc(t.nombre)+'</b><div class="small muted">'+esc(t.norma)+' · '+t.cantidad+' '+({h:'días hábiles',c:'días calendario',m:'meses',a:'años'})[t.unidad]+(t.ley2213?' · Ley 2213 (+2 días)':'')+'</div></td><td class="small"><a href="#" onclick="event.preventDefault();ir(\'procesos\',{id:\''+t.procesoId+'\'})">'+esc(procTxt(p))+'</a></td><td class="num small">'+fCorta(t.fecha)+'</td><td class="num"><b>'+fCorta(t.venc)+'</b><div class="small muted">'+fDia(t.venc)+'</div></td><td class="small">'+esc(nomUser(t.responsableId))+'</td><td>'+(t.estado!=='Cumplido'&&S.user.rol!=='cliente'?'<button class="btn peq" onclick="cumplirTermino(\''+t.id+'\')">Cumplido</button>':'')+'</td></tr>'}).join('')||'<tr><td colspan="7" class="empty">Sin términos</td></tr>')+'</tbody></table></div>';
+}
+function cumplirTermino(id){const t=byId('terminos',id);t.estado='Cumplido';t.cumplido=HOY;guardar();render();toast('Término marcado como cumplido')}
+VISTAS.terminos=()=>{
+  const ts=de('terminos').sort((a,b)=>a.venc<b.venc?-1:1);const pend=ts.filter(t=>t.estado!=='Cumplido');const hechos=ts.filter(t=>t.estado==='Cumplido');
+  const procSel=S.sub.proc||'';
+  return head('Términos judiciales','Cálculo con días hábiles, festivos (Ley 51 de 1983), vacancia judicial, Semana Santa y notificación electrónica de la Ley 2213 de 2022.')
+  +'<div class="card"><h3>Calculadora de términos</h3><div class="f" style="margin-top:12px">'
+  +'<label class="full">Proceso'+selProc('tc_proc',procSel,false)+'</label>'
+  +'<label class="full">Término (catálogo con su norma)<select id="tc_cat" onchange="catSel()"><option value="">— Término personalizado —</option>'+CATALOGO.map((g,gi)=>'<optgroup label="'+esc(g.g)+'">'+g.t.map((x,i)=>'<option value="'+gi+'-'+i+'">'+esc(x[0])+' · '+x[1]+' '+({h:'días háb.',c:'días',m:'meses',a:'años'})[x[2]]+' · '+esc(x[3])+'</option>').join('')+'</optgroup>').join('')+'</select></label>'
+  +'<label>Nombre del término<input id="tc_nom" value="Término personalizado"></label><label>Norma<input id="tc_norma" placeholder="Ej.: CGP art. 318"></label>'
+  +'<label>Fecha de notificación / envío<input id="tc_fecha" type="date" value="'+HOY+'"></label><label>Cantidad<input id="tc_cant" type="number" min="1" value="3"></label>'
+  +'<label>Unidad<select id="tc_uni"><option value="h">Días hábiles</option><option value="c">Días calendario</option><option value="m">Meses</option><option value="a">Años</option></select></label>'
+  +'<label>Responsable<select id="tc_resp">'+optsUsers(['admin','abogado','dependiente']).map(([v,l])=>'<option value="'+v+'"'+(v===S.user.id?' selected':'')+'>'+esc(l)+'</option>').join('')+'</select></label>'
+  +'<label class="chk full"><input type="checkbox" id="tc_2213"> Notificación personal por mensaje de datos (Ley 2213/2022, art. 8): se surte 2 días hábiles después del envío</label></div>'
+  +'<div class="toolbar" style="margin-top:12px"><button class="btn pri" onclick="calcTer()">Calcular vencimiento</button></div><div id="tc_res"></div></div>'
+  +'<h3 style="margin:18px 0 10px">Pendientes ('+pend.length+')</h3>'+tablaTerminos(pend)
+  +(hechos.length?'<h3 style="margin:18px 0 10px">Cumplidos</h3>'+tablaTerminos(hechos):'');
+};
+function catSel(){const v=$('#tc_cat').value;if(!v)return;const [g,i]=v.split('-').map(Number);const x=CATALOGO[g].t[i];$('#tc_nom').value=x[0];$('#tc_norma').value=x[3];$('#tc_cant').value=x[1];$('#tc_uni').value=x[2]}
+let _calc=null;
+function calcTer(){
+  const p=byId('procesos',$('#tc_proc').value);if(!p){toast('Primero cree un proceso para asociar el término');return}const fecha=$('#tc_fecha').value;const cant=num($('#tc_cant').value);if(!fecha||!cant){toast('Indique fecha y cantidad');return}
+  const opt=optOf(p);const r=calcularTermino({fecha,cantidad:cant,unidad:$('#tc_uni').value,ley2213:$('#tc_2213').checked,opt});
+  _calc={procesoId:p.id,nombre:$('#tc_nom').value||'Término',norma:$('#tc_norma').value||'—',fecha,cantidad:cant,unidad:$('#tc_uni').value,ley2213:$('#tc_2213').checked,venc:r.venc,responsableId:$('#tc_resp').value};
+  // días inhábiles en el rango, para transparencia
+  const inh=[];let x=fecha;while(x<r.venc){x=addD(x,1);const m=motivoInhabil(x,opt);if(m&&!/^(Sábado|Domingo)$/.test(m))inh.push(fCorta(x)+' – '+m)}
+  $('#tc_res').innerHTML='<div class="note amb" style="margin-top:12px"><div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px"><div><div class="small muted">VENCE</div><div style="font-family:var(--f-tit);font-size:28px;font-weight:700;line-height:1.1">'+DIAS[pd(r.venc).getDay()]+' '+fLarga(r.venc)+'</div><div class="small">Vencimiento al cierre del despacho de ese día. '+(p.sinVacancia?'Proceso que corre en vacancia.':'')+'</div></div><button class="btn pri" style="margin-left:auto" onclick="guardarTer()">Guardar y crear alerta</button></div><ol class="small" style="margin:10px 0 0;padding-left:18px">'+r.pasos.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ol>'+(inh.length?'<p class="small" style="margin:8px 0 0"><b>Días inhábiles descontados:</b> '+esc(inh.join(' · '))+'</p>':'')+'</div>';
+}
+function guardarTer(){if(!_calc)return;DB.terminos.push(Object.assign({id:uid(),oficinaId:S.of,estado:'Pendiente',creado:HOY},_calc));_calc=null;guardar();render();toast('Término guardado. Aparecerá en alertas y agenda.')}
+
+// ---------- agenda ----------
+VISTAS.agenda=()=>{
+  const ref=S.sub.mes||HOY.slice(0,7);const [y,m]=ref.split('-').map(Number);
+  const ini=new Date(y,m-1,1);const start=new Date(ini);start.setDate(1-((ini.getDay()+6)%7));
+  const ev=visibles('agenda');const ts=S.user.rol==='cliente'?[]:de('terminos').filter(t=>t.estado!=='Cumplido');const opt=optOf();
+  let cel='';for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);const s=ymd(d);const fe=festivos(d.getFullYear())[s];const inh=motivoInhabil(s,opt);
+    const es=ev.filter(a=>a.fecha===s).sort((a,b)=>a.hora<b.hora?-1:1);const tt=ts.filter(t=>t.venc===s);
+    cel+='<div class="c'+(d.getMonth()!==m-1?' fuera':'')+(inh&&d.getDay()%6!==0?' inh':'')+(s===HOY?' hoy':'')+'"><span class="n">'+d.getDate()+'</span>'+(fe?'<span class="fest">'+esc(fe)+'</span>':(inh&&d.getDay()%6!==0?'<span class="fest">'+esc(inh.split(' (')[0])+'</span>':''))+es.map(a=>'<button class="ev '+(a.tipo==='Audiencia'?'aud':'otr')+'" onclick="verEvento(\''+a.id+'\')" title="'+esc(a.hora+' '+a.titulo)+'">'+esc(a.hora+' '+a.titulo)+'</button>').join('')+tt.map(t=>'<button class="ev ter" onclick="ir(\'terminos\')" title="Vence: '+esc(t.nombre)+'">Vence: '+esc(t.nombre)+'</button>').join('')+'</div>'}
+  const prev=ymd(new Date(y,m-2,1)).slice(0,7),next=ymd(new Date(y,m,1)).slice(0,7);
+  const prox=ev.filter(a=>a.fecha>=HOY).sort((a,b)=>(a.fecha+a.hora)<(b.fecha+b.hora)?-1:1);
+  return head('Agenda','Audiencias, diligencias, citas y vencimientos de términos. Los días con rayas son inhábiles para los despachos.',(S.user.rol!=='cliente'?'<button class="btn pri" onclick="editarEvento()">+ Nuevo evento</button>':'')+'<button class="btn" onclick="exportarICS()">'+(EN_MARCO?'Copiar agenda (.ics)':'Descargar para Google Calendar / Outlook')+'</button>')
+  +'<div class="toolbar"><button class="btn" onclick="S.sub.mes=\''+prev+'\';render()" aria-label="Mes anterior">‹</button><h3 style="min-width:170px;text-align:center;text-transform:capitalize">'+MESES[m-1]+' '+y+'</h3><button class="btn" onclick="S.sub.mes=\''+next+'\';render()" aria-label="Mes siguiente">›</button><button class="btn peq" onclick="S.sub.mes=\''+HOY.slice(0,7)+'\';render()">Hoy</button><span class="small muted" style="margin-left:auto">'+pill('Audiencia','p-azul')+' '+pill('Vencimiento','p-rojo')+' '+pill('Otros','p-amb')+'</span></div>'
+  +'<div style="overflow-x:auto"><div class="cal">'+['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map(d=>'<div class="dn">'+d+'</div>').join('')+cel+'</div></div>'
+  +'<h3 style="margin:18px 0 10px">Próximos eventos</h3><div class="card"><div class="list">'+(prox.slice(0,12).map(a=>'<div class="li">'+fechaBox(a.fecha)+'<div class="grow"><b>'+esc(a.titulo)+'</b><div class="small muted">'+esc(a.tipo)+' · '+fDia(a.fecha)+' '+esc(a.hora)+' · '+esc(a.lugar)+(a.procesoId?' · '+esc(procTxt(byId('procesos',a.procesoId))):'')+'</div></div><button class="btn peq" onclick="verEvento(\''+a.id+'\')">Ver</button></div>').join('')||'<div class="empty">Sin eventos próximos</div>')+'</div></div>';
+};
+function verEvento(id){
+  const a=byId('agenda',id);const p=a.procesoId?byId('procesos',a.procesoId):null;const c=p?byId('clientes',p.clienteId):null;
+  const msg='Buen día. Le recordamos: '+a.titulo+', el '+fDia(a.fecha)+' de '+pd(a.fecha).getFullYear()+' a las '+a.hora+'. Lugar: '+a.lugar+'. '+OF().nombre+'.';
+  modal(a.tipo,'<dl class="kv"><dt>Evento</dt><dd><b>'+esc(a.titulo)+'</b></dd><dt>Fecha</dt><dd>'+fDia(a.fecha)+' de '+pd(a.fecha).getFullYear()+' · '+esc(a.hora)+'</dd><dt>Lugar / enlace</dt><dd>'+esc(a.lugar)+'</dd><dt>Responsable</dt><dd>'+esc(nomUser(a.userId))+'</dd>'+(p?'<dt>Proceso</dt><dd>'+esc(procTxt(p))+'</dd><dt>Cliente</dt><dd>'+esc(c?c.nombre:'')+'</dd>':'')+(motivoInhabil(a.fecha,optOf(p))?'<dt>Atención</dt><dd>'+pill('Día inhábil: '+motivoInhabil(a.fecha,optOf(p)),'p-amb')+'</dd>':'')+'</dl>',
+   (S.user.rol!=='cliente'?'<button class="btn del" onclick="borrar(\'agenda\',\''+id+'\')">Eliminar</button><button class="btn" onclick="editarEvento(\''+id+'\')">Editar</button>':'')+(c&&S.user.rol!=='cliente'?'<a class="btn wa" target="_blank" rel="noopener" href="'+waLink(c.tel,msg)+'">Recordar al cliente por WhatsApp</a>':''));
+}
+function editarEvento(id,proc){
+  const a=id?byId('agenda',id):{procesoId:proc||'',fecha:HOY,hora:'09:00',userId:S.user.id,tipo:'Audiencia'};
+  formModal(id?'Editar evento':'Nuevo evento',[{k:'tipo',l:'Tipo',type:'select',opts:['Audiencia','Diligencia','Cita','Reunión','Vencimiento externo','Otro']},{k:'titulo',l:'Descripción',req:1,full:1,ph:'Ej.: Audiencia inicial art. 372 CGP'},{k:'fecha',l:'Fecha',type:'date',req:1},{k:'hora',l:'Hora',type:'time',req:1},{k:'lugar',l:'Lugar o enlace de la audiencia virtual',full:1},{k:'procesoId',l:'Proceso',type:'select',opts:optsProc()},{k:'userId',l:'Responsable',type:'select',opts:optsUsers()}],a,d=>{
+    const m=motivoInhabil(d.fecha,optOf(byId('procesos',d.procesoId)));
+    if(id)Object.assign(a,d);else DB.agenda.push(Object.assign({id:uid(),oficinaId:S.of},d));toast(m?'Guardado. Atención: '+m:'Evento guardado')});
+}
+function exportarICS(){
+  const ev=visibles('agenda');const ts=S.user.rol==='cliente'?[]:de('terminos').filter(t=>t.estado!=='Cumplido');
+  const f=s=>s.replace(/-/g,'');const L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//SkyNet Genesis//DiligencIA//ES'];
+  ev.forEach(a=>{const h=(a.hora||'09:00').replace(':','');L.push('BEGIN:VEVENT','UID:'+a.id+'@diligencia','DTSTART;TZID=America/Bogota:'+f(a.fecha)+'T'+h+'00','DURATION:PT1H','SUMMARY:'+a.tipo+': '+a.titulo,'LOCATION:'+(a.lugar||''),'BEGIN:VALARM','TRIGGER:-P1D','ACTION:DISPLAY','DESCRIPTION:Recordatorio','END:VALARM','END:VEVENT')});
+  ts.forEach(t=>L.push('BEGIN:VEVENT','UID:'+t.id+'@diligencia','DTSTART;VALUE=DATE:'+f(t.venc),'SUMMARY:VENCE: '+t.nombre+' ('+t.norma+')','BEGIN:VALARM','TRIGGER:-P2D','ACTION:DISPLAY','DESCRIPTION:Vence término','END:VALARM','END:VEVENT'));
+  L.push('END:VCALENDAR');const txt=L.join('\r\n');
+  if(EN_MARCO){copiar(txt,'Agenda copiada en formato .ics');return}
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'text/calendar'}));a.download='agenda-diligencia.ics';a.click();
+}
+function borrar(col,id){DB[col]=DB[col].filter(x=>x.id!==id);guardar();cerrar();render();toast('Eliminado')}
+
+// ---------- tareas ----------
+function listaTareas(L){return '<div class="list">'+(L.sort((a,b)=>(a.hecha-b.hecha)||(a.fecha<b.fecha?-1:1)).map(k=>'<div class="li"><input type="checkbox" aria-label="Hecha" '+(k.hecha?'checked':'')+' onchange="toggleTarea(\''+k.id+'\')" style="margin-top:4px;width:18px;height:18px"><div class="grow"><span style="'+(k.hecha?'text-decoration:line-through;opacity:.6':'')+'">'+esc(k.titulo)+'</span><div class="small muted">'+esc(nomUser(k.userId))+' · '+fDia(k.fecha)+(k.procesoId?' · '+esc(procTxt(byId('procesos',k.procesoId))):'')+'</div></div>'+(!k.hecha&&k.fecha<HOY?pill('Atrasada','p-rojo'):(!k.hecha&&k.fecha===HOY?pill('Hoy','p-amb'):''))+'</div>').join('')||'<div class="empty">Sin tareas</div>')+'</div>'}
+function toggleTarea(id){const k=byId('tareas',id);k.hecha=!k.hecha;guardar();render()}
+VISTAS.tareas=()=>{const mias=S.sub.mias;let L=de('tareas');if(mias)L=L.filter(k=>k.userId===S.user.id);
+  return head('Tareas del equipo','Asigne actividades con fecha límite a abogados y dependientes.','<button class="btn pri" onclick="editarTarea()">+ Nueva tarea</button>')
+  +'<div class="toolbar"><label class="chk"><input type="checkbox" '+(mias?'checked':'')+' onchange="S.sub.mias=this.checked;render()"> Solo mis tareas</label></div><div class="card">'+listaTareas(L)+'</div>'};
+function editarTarea(id,proc){const k=id?byId('tareas',id):{procesoId:proc||'',fecha:addD(HOY,1),userId:S.user.id};formModal('Nueva tarea',[{k:'titulo',l:'Tarea',req:1,full:1},{k:'userId',l:'Responsable',type:'select',opts:optsUsers(['admin','abogado','dependiente'])},{k:'fecha',l:'Fecha límite',type:'date',req:1},{k:'procesoId',l:'Proceso',type:'select',opts:optsProc(),full:1}],k,d=>{if(id)Object.assign(k,d);else DB.tareas.push(Object.assign({id:uid(),oficinaId:S.of,hecha:false},d));toast('Tarea guardada')})}
+
+// ---------- cobros ----------
+function tablaCobros(L){
+  return '<div class="tw"><table><thead><tr><th>N.º</th><th>Cliente / concepto</th><th>Total</th><th>Saldo</th><th>Vence</th><th>Estado</th><th></th></tr></thead><tbody>'+(L.sort((a,b)=>a.numero<b.numero?1:-1).map(b=>{const e=estadoCobro(b);const c=byId('clientes',b.clienteId);return '<tr><td class="num"><b>'+esc(b.numero)+'</b></td><td class="small"><b>'+esc(c?c.nombre:'')+'</b><div class="muted">'+esc(b.concepto)+'</div></td><td class="num">'+cop(totalCobro(b))+(b.iva?'<div class="small muted">incl. IVA</div>':'')+'</td><td class="num"><b>'+cop(saldoCobro(b))+'</b></td><td class="num small">'+fCorta(b.venc)+'</td><td>'+pill(e[0],e[1])+'</td><td style="white-space:nowrap"><button class="btn peq" onclick="docCobro(\''+b.id+'\')">Ver</button> '+(saldoCobro(b)>0&&puede('admin','contable')?'<button class="btn peq" onclick="registrarPago(\''+b.id+'\')">Pago</button> <a class="btn peq wa" target="_blank" rel="noopener" href="'+waLink(c&&c.tel,'Buen día, '+(c?c.nombre:'')+'. Le recordamos la cuenta de cobro '+b.numero+' por '+cop(saldoCobro(b))+' ('+b.concepto+'), con vencimiento el '+fCorta(b.venc)+'. Gracias. '+OF().nombre)+'">Recordar</a>':'')+'</td></tr>'}).join('')||'<tr><td colspan="7" class="empty">Sin cuentas de cobro</td></tr>')+'</tbody></table></div>';
+}
+VISTAS.cobros=()=>{
+  const cob=de('cobros');const t=S.sub.tab||'cc';const mes=HOY.slice(0,7);
+  const pagos=DB.pagos.filter(p=>cob.some(b=>b.id===p.cobroId));
+  const cartera=cob.reduce((s,b)=>s+saldoCobro(b),0);
+  const ed=[0,0,0,0];cob.forEach(b=>{const s=saldoCobro(b);if(!s)return;const dv=diffD(b.venc,HOY);ed[dv<=0?0:dv<=30?1:dv<=60?2:3]+=s});const mx=Math.max(...ed,1);
+  const fact=cob.filter(b=>b.fecha.startsWith(mes)).reduce((s,b)=>s+totalCobro(b),0);const rec=pagos.filter(p=>p.fecha.startsWith(mes)).reduce((s,p)=>s+p.valor,0);
+  let body='';
+  if(t==='cc')body=tablaCobros(cob);
+  if(t==='pg')body='<div class="tw"><table><thead><tr><th>Fecha</th><th>Cuenta</th><th>Cliente</th><th>Medio</th><th>Valor</th></tr></thead><tbody>'+(pagos.sort((a,b)=>a.fecha<b.fecha?1:-1).map(p=>{const b=byId('cobros',p.cobroId);return '<tr><td class="num">'+fCorta(p.fecha)+'</td><td>'+esc(b.numero)+'</td><td class="small">'+esc(nomCli(b.clienteId))+'</td><td class="small">'+esc(p.medio)+'</td><td class="num"><b>'+cop(p.valor)+'</b></td></tr>'}).join('')||'<tr><td colspan="5" class="empty">Sin pagos</td></tr>')+'</tbody></table></div>';
+  if(t==='gs'){const gs=de('gastos');body='<div class="toolbar"><button class="btn pri" onclick="editarGasto()">+ Registrar gasto</button><span class="small muted">Gastos procesales pagados por la oficina y reembolsables por el cliente (aranceles, notificaciones, peritos, secuestre).</span></div><div class="tw"><table><thead><tr><th>Fecha</th><th>Proceso</th><th>Concepto</th><th>Valor</th></tr></thead><tbody>'+(gs.map(g=>'<tr><td class="num">'+fCorta(g.fecha)+'</td><td class="small">'+esc(procTxt(byId('procesos',g.procesoId)))+'</td><td class="small">'+esc(g.concepto)+'</td><td class="num">'+cop(g.valor)+'</td></tr>').join('')||'<tr><td colspan="4" class="empty">Sin gastos</td></tr>')+'</tbody></table></div>'}
+  return head('Honorarios y cobros','Cuentas de cobro, abonos, cartera por edades y gastos reembolsables.',puede('admin','contable')?'<button class="btn pri" onclick="editarCobro()">+ Cuenta de cobro</button>':'')
+   +'<div class="grid g4">'+kpi('Cartera total',cop(cartera),cob.filter(b=>saldoCobro(b)>0).length+' cuentas abiertas')+kpi('Vencida',cop(ed[1]+ed[2]+ed[3]),'',ed[1]+ed[2]+ed[3]?'peligro':'')+kpi('Facturado este mes',cop(fact),'')+kpi('Recaudado este mes',cop(rec),'')+'</div>'
+   +'<div class="card" style="margin:14px 0"><h3>Cartera por edades</h3><div class="grid" style="margin-top:10px;gap:8px">'+['Al día','1 a 30 días','31 a 60 días','Más de 60 días'].map((l,i)=>'<div style="display:grid;grid-template-columns:120px 1fr 120px;gap:10px;align-items:center"><span class="small">'+l+'</span><div class="bar"><i class="'+(i?'a':'')+'" style="width:'+(ed[i]/mx*100)+'%;'+(i>=2?'background:var(--rojo)':'')+'"></i></div><span class="num small" style="text-align:right">'+cop(ed[i])+'</span></div>').join('')+'</div></div>'
+   +'<div class="tabs">'+[['cc','Cuentas de cobro'],['pg','Pagos recibidos'],['gs','Gastos del proceso']].map(([k,l])=>'<button class="'+(t===k?'on':'')+'" onclick="S.sub.tab=\''+k+'\';render()">'+l+'</button>').join('')+'</div>'+body;
+};
+function editarCobro(id,proc){
+  const o=OF();const p=proc?byId('procesos',proc):null;
+  const b=id?byId('cobros',id):{procesoId:proc||'',clienteId:p?p.clienteId:'',fecha:HOY,venc:addD(HOY,30),numero:'CC-'+String(de('cobros').reduce((m,x)=>Math.max(m,num(x.numero)),0)+1).padStart(4,'0'),iva:false};
+  formModal('Nueva cuenta de cobro',[{k:'numero',l:'Número',req:1},{k:'clienteId',l:'Cliente',type:'select',opts:optsCli(),req:1},{k:'procesoId',l:'Proceso',type:'select',opts:optsProc()},{k:'concepto',l:'Concepto',req:1,full:1,ph:'Ej.: Honorarios etapa 2 – audiencia inicial'},{k:'valor',l:'Valor de honorarios antes de IVA ($)',type:'number',req:1},{k:'fecha',l:'Fecha de expedición',type:'date',req:1},{k:'venc',l:'Fecha de vencimiento',type:'date',req:1},{k:'iva',l:'Cobrar IVA 19 % (si el abogado es responsable de IVA, debe expedir factura electrónica DIAN)',type:'check',full:1}],b,d=>{if(id)Object.assign(b,d);else{DB.cobros.push(Object.assign({id:uid(),oficinaId:S.of},d))}toast('Cuenta de cobro creada')});
+}
+function registrarPago(id){const b=byId('cobros',id);formModal('Registrar pago – '+b.numero,[{k:'fecha',l:'Fecha',type:'date',def:HOY,req:1},{k:'valor',l:'Valor recibido ($)',type:'number',def:saldoCobro(b),req:1},{k:'medio',l:'Medio de pago',type:'select',opts:['Transferencia','Bold (enlace de pago)','Consignación','Efectivo','Cheque']}],null,d=>{DB.pagos.push(Object.assign({id:uid(),cobroId:id,oficinaId:S.of},d));toast('Pago registrado')})}
+function editarGasto(id,proc){formModal('Registrar gasto del proceso',[{k:'procesoId',l:'Proceso',type:'select',opts:optsProc(false),def:proc,req:1,full:1},{k:'concepto',l:'Concepto',req:1,full:1},{k:'valor',l:'Valor ($)',type:'number',req:1},{k:'fecha',l:'Fecha',type:'date',def:HOY,req:1},{k:'reembolsable',l:'Reembolsable por el cliente',type:'check',def:true}],null,d=>{DB.gastos.push(Object.assign({id:uid(),oficinaId:S.of},d));toast('Gasto registrado')})}
+
+// ---------- documentos ----------
+function numLetras(n){n=Math.floor(n);if(n===0)return 'cero';const U=['','un','dos','tres','cuatro','cinco','seis','siete','ocho','nueve','diez','once','doce','trece','catorce','quince','dieciséis','diecisiete','dieciocho','diecinueve','veinte','veintiún','veintidós','veintitrés','veinticuatro','veinticinco','veintiséis','veintisiete','veintiocho','veintinueve'];const D=['','','','treinta','cuarenta','cincuenta','sesenta','setenta','ochenta','noventa'];const C=['','ciento','doscientos','trescientos','cuatrocientos','quinientos','seiscientos','setecientos','ochocientos','novecientos'];
+  const c3=x=>{if(x===100)return 'cien';const c=Math.floor(x/100),r=x%100;let s=C[c];if(r){s+=(s?' ':'')+(r<30?U[r]:D[Math.floor(r/10)]+(r%10?' y '+U[r%10]:''))}return s};
+  let s='';const mill=Math.floor(n/1e6),mil=Math.floor((n%1e6)/1000),r=n%1000;
+  if(mill)s+=(mill===1?'un millón':c3(mill)+' millones');if(mil)s+=(s?' ':'')+(mil===1?'mil':c3(mil)+' mil');if(r)s+=(s?' ':'')+c3(r);
+  return s+((!mil&&!r&&mill)?' de':'');
+}
+function marcoDoc(titulo,meta,cuerpo){
+  const o=OF();
+  return '<div class="doc" id="docx"><div class="dh">'+(o.logo?'<img src="'+o.logo+'" alt="">':'')+'<div><h1>'+esc(o.nombre)+'</h1><div style="font-size:12px;color:#5B6B72">NIT/CC '+esc(o.nit)+' · '+esc(o.direccion)+', '+esc(o.ciudad)+' · '+esc(o.tel)+' · '+esc(o.email)+'</div></div><div class="meta">'+meta+'</div></div><div class="doc-body" contenteditable="true" spellcheck="true"><h2 style="font-size:20px;color:#1E3A4C;margin-bottom:12px">'+esc(titulo)+'</h2>'+cuerpo+'</div>'
+  +'<div class="pie">'+LOGO_SG+'<span>Documento generado con DiligencIA · SkyNet Genesis · '+SG.correo+' · WhatsApp 304 437 5758</span></div></div>';
+}
+function verDoc(titulo,html){
+  _docTitulo=titulo;
+  modal(titulo,'<p class="small muted" style="margin:-6px 0 10px">Puede escribir directamente sobre el documento. Lo resaltado entre [corchetes] es para completar.</p><div style="overflow-x:auto">'+html+'</div>'+(EN_MARCO?'<p class="small muted" style="margin-top:10px">En la versión publicada (diligencia.skynetgenesis.com) este documento se descarga en Word o se imprime / guarda en PDF con un clic. Aquí puede copiar el texto.</p>':''),'<button class="btn" onclick="copiar(document.getElementById(\'docx\').innerText,\'Texto del documento copiado\')">Copiar texto</button>'+(EN_MARCO?'':'<button class="btn" onclick="descargarWord()">Descargar Word</button><button class="btn pri" onclick="imprimirDoc()">Imprimir / guardar PDF</button>'),true);
+}
+let _docTitulo='documento';
+function descargarWord(){const css='body{font-family:Arial,sans-serif;font-size:11pt;color:#15232B}h1{font-size:18pt;color:#1E3A4C;margin:0}h2{font-size:14pt;color:#1E3A4C}h3,h4{color:#1E3A4C}table{border-collapse:collapse;width:100%}td,th{border:1px solid #D6DFDD;padding:4px 6px;text-align:left}mark{background:#FCF3DD}.firma div{border-top:1px solid #15232B;margin-top:40px;padding-top:4px;width:240px}.pie{font-size:8pt;color:#5B6B72;border-top:1px solid #D6DFDD;margin-top:20px;padding-top:6px}.pie svg{display:none}.dh img{width:60px;height:60px}';
+  const html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>'+esc(_docTitulo)+'</title><style>'+css+'</style></head><body>'+$('#docx').innerHTML+'</body></html>';
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+html],{type:'application/msword'}));a.download=_docTitulo.replace(/[^\wáéíóúñÁÉÍÓÚÑ -]/g,'').slice(0,60)+'.doc';a.click();toast('Documento descargado para Word')}
+function imprimirDoc(){const w=window.open('','_blank');if(!w){toast('Permita ventanas emergentes para imprimir');return}w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Documento</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Public+Sans:wght@400;600&display=swap"><style>'+[...document.styleSheets].map(s=>{try{return [...s.cssRules].map(r=>r.cssText).join('\n')}catch(e){return ''}}).join('\n')+' body{background:#fff;padding:0;margin:0}.doc{border:0}</style></head><body>'+$('#docx').outerHTML+'</body></html>');w.document.close();setTimeout(()=>w.print(),600)}
+function docCobro(id){
+  const b=byId('cobros',id);const c=byId('clientes',b.clienteId);const p=byId('procesos',b.procesoId);const o=OF();const tot=totalCobro(b);const pag=pagadoCobro(b);
+  verDoc('Cuenta de cobro '+b.numero,marcoDoc('Cuenta de cobro N.º '+b.numero,'Fecha: '+fCorta(b.fecha)+'<br>Vence: '+fCorta(b.venc),
+   '<p><b>'+esc(c.nombre)+'</b><br>'+esc(c.doc)+'<br>'+esc(c.dir)+'</p><p>DEBE A: <b>'+esc(o.nombre)+'</b>, identificado(a) con NIT/CC '+esc(o.nit)+', la suma de <b>'+numLetras(tot)+' pesos m/cte ('+cop(tot)+')</b>, por el siguiente concepto:</p>'
+   +'<table><thead><tr><th>Concepto</th><th style="text-align:right">Valor</th></tr></thead><tbody><tr><td>'+esc(b.concepto)+(p?'<br><span style="font-size:12px;color:#5B6B72">'+esc(p.clase)+' – Rad. '+esc(p.radicado||'N/A')+'</span>':'')+'</td><td style="text-align:right" class="num">'+cop(b.valor)+'</td></tr>'+(b.iva?'<tr><td>IVA 19 %</td><td style="text-align:right" class="num">'+cop(tot-b.valor)+'</td></tr>':'')+'<tr><td><b>Total</b></td><td style="text-align:right" class="tot num">'+cop(tot)+'</td></tr>'+(pag?'<tr><td>Abonos recibidos</td><td style="text-align:right" class="num">– '+cop(pag)+'</td></tr><tr><td><b>Saldo por pagar</b></td><td style="text-align:right"><b>'+cop(tot-pag)+'</b></td></tr>':'')+'</tbody></table>'
+   +'<p style="font-size:12px;color:#5B6B72;margin-top:14px">'+(b.iva?'Si el prestador es responsable de IVA, este valor debe soportarse con factura electrónica de venta (Estatuto Tributario art. 615 y Res. DIAN 165 de 2023). ':'Declaro que no soy responsable de IVA ni estoy obligado(a) a expedir factura electrónica. ')+'El pagador aplicará la retención en la fuente que corresponda por honorarios. Pago por transferencia, consignación o enlace de pago Bold.</p>'
+   +'<div class="firma"><div>'+esc(nomUser(de('users').find(u=>u.rol==='admin')?.id))+'<br>'+esc(o.nombre)+'</div></div>'));
+}
+function docInforme(cid){
+  const c=byId('clientes',cid);const ps=de('procesos').filter(p=>p.clienteId===cid);const bs=de('cobros').filter(b=>b.clienteId===cid);
+  verDoc('Informe al cliente',marcoDoc('Informe de gestión y estado de procesos','Fecha: '+fCorta(HOY),
+   '<p>Señor(a)<br><b>'+esc(c.nombre)+'</b><br>'+esc(c.doc)+'</p><p>En cumplimiento del deber de mantener informado al cliente sobre la gestión encomendada (Ley 1123 de 2007, Código Disciplinario del Abogado), presentamos el estado de sus asuntos a la fecha:</p>'
+   +ps.map(p=>{const acts=p.actuaciones.filter(a=>a.pub).sort((a,b)=>a.f<b.f?1:-1).slice(0,4);const ag=de('agenda').filter(a=>a.procesoId===p.id&&a.fecha>=HOY);return '<h3 style="font-size:16px;color:#1E3A4C;margin-top:16px">'+esc(p.clase)+'</h3><p style="font-size:12.5px;margin:4px 0">Radicado: '+esc(p.radicado||'N/A')+' · '+esc(p.despacho)+'<br>Partes: '+esc(p.demandante)+' contra '+esc(p.demandado)+'<br>Etapa: <b>'+esc(p.etapa)+'</b> · Estado: '+esc(p.estado)+'</p>'+(acts.length?'<table><thead><tr><th>Fecha</th><th>Actuación</th></tr></thead><tbody>'+acts.map(a=>'<tr><td class="num">'+fCorta(a.f)+'</td><td>'+esc(a.t)+'</td></tr>').join('')+'</tbody></table>':'')+(ag.length?'<p style="font-size:12.5px"><b>Próximo:</b> '+ag.map(a=>esc(a.titulo)+' – '+fCorta(a.fecha)+' '+esc(a.hora)).join('; ')+'</p>':'')}).join('')
+   +'<h3 style="font-size:16px;color:#1E3A4C;margin-top:16px">Estado de cuenta</h3><table><thead><tr><th>Cuenta</th><th>Concepto</th><th style="text-align:right">Saldo</th></tr></thead><tbody>'+(bs.map(b=>'<tr><td>'+esc(b.numero)+'</td><td>'+esc(b.concepto)+'</td><td style="text-align:right" class="num">'+cop(saldoCobro(b))+'</td></tr>').join('')||'<tr><td colspan="3">Sin cuentas pendientes</td></tr>')+'</tbody></table>'
+   +'<div class="firma"><div>Apoderado(a)<br>'+esc(OF().nombre)+'</div></div>'));
+}
+function docPoder(pid){
+  const p=byId('procesos',pid);const c=byId('clientes',p.clienteId);const ab=byId('users',p.abogadoId)||{};
+  verDoc('Poder especial',marcoDoc('Poder especial','Lugar y fecha: '+esc(OF().ciudad)+', '+fCorta(HOY),
+   '<p>Señor(a)<br><b>'+esc(p.despacho)+'</b><br>E. S. D.</p><p>Referencia: '+esc(p.clase)+'<br>Demandante: '+esc(p.demandante)+'<br>Demandado: '+esc(p.demandado)+(p.radicado?'<br>Radicado: '+esc(p.radicado):'')+'</p>'
+   +'<p><b>'+esc(c.nombre)+'</b>, mayor de edad, identificado(a) con '+esc(c.doc)+', con correo electrónico '+esc(c.canal||c.email)+', por medio del presente escrito confiero <b>poder especial, amplio y suficiente</b> a <b>'+esc(ab.nombre||'')+'</b>, abogado(a) en ejercicio, portador(a) de la tarjeta profesional '+esc(ab.tp||'_______')+' del Consejo Superior de la Judicatura, con correo electrónico inscrito en el Registro Nacional de Abogados (SIRNA) <b>'+esc(ab.email||'')+'</b>, para que en mi nombre y representación adelante y lleve hasta su terminación el proceso de la referencia.</p>'
+   +'<p>Mi apoderado(a) queda facultado(a) para recibir, conciliar, transigir, desistir, sustituir, reasumir, presentar recursos y, en general, para realizar todas las actuaciones necesarias en defensa de mis intereses, conforme al artículo 77 del Código General del Proceso.</p>'
+   +'<p>Este poder se confiere mediante mensaje de datos, de conformidad con el artículo 5.º de la Ley 2213 de 2022, y se presume auténtico sin necesidad de firma manuscrita, digital o presentación personal.</p>'
+   +'<div class="firma"><div>'+esc(c.nombre)+'<br>'+esc(c.doc)+'</div><div>Acepto,<br>'+esc(ab.nombre||'')+'<br>T.P. '+esc(ab.tp||'')+'</div></div>'));
+}
+function docContrato(pid){
+  const p=byId('procesos',pid);const c=byId('clientes',p.clienteId);const o=OF();const h=p.honorarios||{};
+  verDoc('Contrato de prestación de servicios',marcoDoc('Contrato de prestación de servicios profesionales de abogado','Fecha: '+fCorta(HOY),
+   '<p>Entre <b>'+esc(c.nombre)+'</b> ('+esc(c.doc)+'), en adelante EL CLIENTE, y <b>'+esc(o.nombre)+'</b> (NIT/CC '+esc(o.nit)+'), en adelante EL ABOGADO, se celebra el presente contrato:</p>'
+   +'<p><b>Primera – Objeto.</b> EL ABOGADO prestará sus servicios profesionales para: '+esc(p.clase)+' ante '+esc(p.despacho)+', en calidad de apoderado de EL CLIENTE ('+esc(p.rolCliente)+').</p>'
+   +'<p><b>Segunda – Honorarios.</b> Modalidad: '+esc(h.modalidad||'')+'. '+(h.valor?'Valor: '+numLetras(h.valor)+' pesos ('+cop(h.valor)+'). ':'')+(h.porcentaje?'Porcentaje: '+h.porcentaje+' % sobre lo efectivamente obtenido por EL CLIENTE. ':'')+'Los gastos procesales (aranceles, notificaciones, peritos, auxiliares de la justicia) corren por cuenta de EL CLIENTE.</p>'
+   +'<p><b>Tercera – Obligaciones del abogado.</b> Atender con celosa diligencia el encargo, guardar el secreto profesional, informar periódicamente el estado del asunto y rendir cuentas de los dineros recibidos, conforme a la Ley 1123 de 2007.</p>'
+   +'<p><b>Cuarta – Obligaciones del cliente.</b> Suministrar información veraz y oportuna, los documentos requeridos y pagar los honorarios y gastos en las fechas pactadas.</p>'
+   +'<p><b>Quinta – Datos personales.</b> EL CLIENTE autoriza el tratamiento de sus datos para la ejecución de este contrato, conforme a la Ley 1581 de 2012 y el Decreto 1377 de 2013 (compilado en el Decreto 1074 de 2015).</p>'
+   +'<p><b>Sexta – Terminación.</b> Por cumplimiento del objeto, mutuo acuerdo o revocatoria del poder; en este último caso se reconocerán los honorarios causados.</p>'
+   +'<div class="firma"><div>EL CLIENTE<br>'+esc(c.nombre)+'</div><div>EL ABOGADO<br>'+esc(o.nombre)+'</div></div>'));
+}
+function docAutorizacion(cid){
+  const c=byId('clientes',cid);const o=OF();
+  verDoc('Autorización de datos personales',marcoDoc('Autorización para el tratamiento de datos personales','Fecha: '+fCorta(HOY),
+   '<p>Yo, <b>'+esc(c.nombre)+'</b>, identificado(a) con '+esc(c.doc)+', autorizo de manera previa, expresa e informada a <b>'+esc(o.nombre)+'</b> para recolectar, almacenar, usar y circular mis datos personales con las siguientes finalidades: (i) la prestación de servicios jurídicos y la representación judicial o extrajudicial; (ii) la comunicación sobre el estado de mis asuntos por correo, teléfono o WhatsApp; (iii) la facturación y el cobro de honorarios; y (iv) el cumplimiento de obligaciones legales.</p>'
+   +'<p>Conozco que mis derechos son conocer, actualizar, rectificar y suprimir mis datos, solicitar prueba de esta autorización y presentar quejas ante la Superintendencia de Industria y Comercio, en los términos de la Ley 1581 de 2012. Los datos sensibles solo se tratarán cuando sean indispensables para el asunto encomendado. Canal de atención: '+esc(o.email)+'.</p>'
+   +'<div class="firma"><div>'+esc(c.nombre)+'<br>'+esc(c.doc)+'</div></div>'));
+}
+// ---------- reportes ----------
+VISTAS.reportes=()=>{
+  const ps=de('procesos');const grp=(arr,f)=>arr.reduce((m,x)=>{const k=f(x);m[k]=(m[k]||0)+1;return m},{});
+  const barras=(obj,fmt=v=>v)=>{const e=Object.entries(obj).sort((a,b)=>b[1]-a[1]);const mx=Math.max(...e.map(x=>x[1]),1);return '<div class="grid" style="gap:8px;margin-top:10px">'+e.map(([k,v])=>'<div style="display:grid;grid-template-columns:minmax(0,150px) 1fr 90px;gap:10px;align-items:center"><span class="small" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(k)+'">'+esc(k)+'</span><div class="bar"><i style="width:'+(v/mx*100)+'%"></i></div><span class="num small" style="text-align:right">'+fmt(v)+'</span></div>').join('')+'</div>'};
+  const porCli={};de('cobros').forEach(b=>{const s=saldoCobro(b);if(s)porCli[nomCli(b.clienteId)]=(porCli[nomCli(b.clienteId)]||0)+s});
+  const ing={};DB.pagos.filter(p=>de('cobros').some(b=>b.id===p.cobroId)).forEach(p=>{const k=p.fecha.slice(0,7);ing[k]=(ing[k]||0)+p.valor});
+  const term=de('terminos');const cumpl=term.filter(t=>t.estado==='Cumplido').length;
+  return head('Reportes','Indicadores de la oficina para el socio administrador y contabilidad.','<button class="btn" onclick="exportarCSV()">'+(EN_MARCO?'Copiar procesos (CSV)':'Exportar procesos a Excel (CSV)')+'</button>')
+  +'<div class="grid g4">'+kpi('Procesos totales',ps.length,ps.filter(p=>p.estado==='Activo').length+' activos')+kpi('Términos cumplidos',cumpl+' / '+term.length,'control de vencimientos')+kpi('Clientes',de('clientes').length,de('clientes').filter(c=>!c.habeas).length+' sin autorización de datos')+kpi('Cartera',cop(Object.values(porCli).reduce((a,b)=>a+b,0)),Object.keys(porCli).length+' clientes con saldo')+'</div>'
+  +'<div class="grid g2" style="margin-top:14px"><div class="card"><h3>Procesos activos por abogado</h3>'+barras(grp(ps.filter(p=>p.estado==='Activo'),p=>nomUser(p.abogadoId)))+'</div><div class="card"><h3>Procesos por especialidad</h3>'+barras(grp(ps,p=>p.especialidad))+'</div>'
+  +'<div class="card"><h3>Saldo por cliente</h3>'+barras(porCli,cop)+'</div><div class="card"><h3>Recaudo por mes</h3>'+barras(Object.fromEntries(Object.entries(ing).sort().map(([k,v])=>[MESES[+k.slice(5)-1]+' '+k.slice(0,4),v])),cop)+'</div></div>';
+};
+function exportarCSV(){const rows=[['Nombre','Radicado','Clase','Despacho','Cliente','Demandante','Demandado','Etapa','Estado','Responsable','Inicio','Última revisión']].concat(de('procesos').map(p=>[p.alias,p.radicado,p.clase,p.despacho,nomCli(p.clienteId),p.demandante,p.demandado,p.etapa,p.estado,nomUser(p.abogadoId),p.fechaInicio,p.ultimaRevision]));const csv='﻿'+rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\r\n');
+  if(EN_MARCO){copiar(csv,'Procesos copiados en formato CSV');return}const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='procesos-diligencia.csv';a.click()}
+
+// ---------- usuarios ----------
+VISTAS.usuarios=()=>{const o=OF();const plan=PLANES.find(p=>p.id===o.plan);const abs=de('users').filter(u=>u.activo&&['admin','abogado'].includes(u.rol)).length;
+  return head('Usuarios y permisos','Plan '+plan.n+': '+abs+' de '+(plan.u>100?'ilimitados':plan.u)+' abogados activos.','<button class="btn pri" onclick="editarUsuario()">+ Nuevo usuario</button>')
+  +'<div class="tw"><table><thead><tr><th>Nombre</th><th>Perfil</th><th>Correo</th><th>Tarjeta profesional</th><th>Estado</th><th></th></tr></thead><tbody>'+de('users').map(u=>'<tr><td><b>'+esc(u.nombre)+'</b></td><td>'+pill(ROLES[u.rol].n,'p-azul')+'</td><td class="small">'+esc(u.email)+'</td><td class="small">'+esc(u.tp||'—')+'</td><td>'+(u.activo?pill('Activo','p-ver'):pill('Inactivo','p-gris'))+'</td><td><button class="btn peq" onclick="editarUsuario(\''+u.id+'\')">Editar</button></td></tr>').join('')+'</tbody></table></div>'
+  +'<div class="card" style="margin-top:14px"><h3>Qué puede hacer cada perfil</h3><div class="tw" style="margin-top:10px"><table><thead><tr><th>Perfil</th><th>Acceso</th></tr></thead><tbody>'+Object.values(ROLES).map(r=>'<tr><td><b>'+r.n+'</b></td><td class="small">'+r.d+' · Menú: '+r.menu.map(m=>MENU[m]).join(', ')+'</td></tr>').join('')+'</tbody></table></div></div>'};
+function editarUsuario(id){const u=id?byId('users',id):{rol:'abogado',activo:true};formModal(id?'Editar usuario':'Nuevo usuario',[{k:'nombre',l:'Nombre completo',req:1},{k:'email',l:'Correo (inicio de sesión)',type:'email',req:1},{k:'rol',l:'Perfil',type:'select',opts:Object.entries(ROLES).filter(([k])=>k!=='cliente').map(([k,r])=>[k,r.n])},{k:'tp',l:'Tarjeta profesional',ph:'TP 123.456'},{k:'activo',l:'Usuario activo',type:'check'}],u,d=>{const o=OF();const plan=PLANES.find(p=>p.id===o.plan);const abs=de('users').filter(x=>x.activo&&['admin','abogado'].includes(x.rol)&&x.id!==id).length;if(d.activo&&['admin','abogado'].includes(d.rol)&&abs>=plan.u){toast('El plan '+plan.n+' permite '+plan.u+' abogado(s). Cambie de plan en Configuración.');return false}if(id)Object.assign(u,d);else DB.users.push(Object.assign({id:uid(),oficinaId:S.of},d));toast('Usuario guardado')})}
+
+// ---------- configuración ----------
+VISTAS.config=()=>{const o=OF();const c=o.config;const y=new Date().getFullYear();
+  const prox=[];let x=HOY;const lim=addD(HOY,120);while(x<=lim){const m=motivoInhabil(x,optOf());if(m&&!/^(Sábado|Domingo)$/.test(m))prox.push([x,m]);x=addD(x,1)}
+  return head('Configuración',esc(o.nombre))
+  +'<div class="grid g2"><div class="card"><h3>Datos de la oficina</h3><p class="small muted">Aparecen en todos los documentos.</p><div class="toolbar" style="margin-top:8px">'+(o.logo?'<img src="'+o.logo+'" alt="Logo" style="width:64px;height:64px;object-fit:contain;border:1px solid var(--line);border-radius:8px;background:#fff">':'<div class="empty" style="padding:10px;border:1px dashed var(--line);border-radius:8px">Sin logo</div>')+'<label class="btn">Subir logo<input type="file" accept="image/*" hidden onchange="subirLogo(this)"></label>'+(o.logo?'<button class="btn peq del" onclick="OF().logo=\'\';guardar();render()">Quitar</button>':'')+'</div><dl class="kv"><dt>Nombre</dt><dd>'+esc(o.nombre)+'</dd><dt>NIT / CC</dt><dd>'+esc(o.nit)+'</dd><dt>Dirección</dt><dd>'+esc(o.direccion)+', '+esc(o.ciudad)+'</dd><dt>Teléfono</dt><dd>'+esc(o.tel)+'</dd><dt>Correo</dt><dd>'+esc(o.email)+'</dd></dl><div class="toolbar" style="margin-top:10px"><button class="btn" onclick="editarOficina()">Editar datos</button><button class="btn" onclick="editarOficina(true)">+ Crear otra oficina</button></div></div>'
+  +'<div class="card"><h3>Cómputo de términos</h3><div class="f" style="margin-top:10px"><label class="chk full"><input type="checkbox" '+(c.vacancia?'checked':'')+' onchange="OF().config.vacancia=this.checked;guardar();render()"> Descontar vacancia judicial colectiva (20 de diciembre a 10 de enero)</label><label class="chk full"><input type="checkbox" '+(c.semanaSanta?'checked':'')+' onchange="OF().config.semanaSanta=this.checked;guardar();render()"> Descontar lunes, martes y miércoles santos (despachos cerrados)</label></div><h4 style="margin-top:12px">Cierres extraordinarios</h4><p class="small muted">Paros, suspensión de términos por acuerdo del Consejo Superior o cierre del despacho.</p><div class="list">'+(c.cierres.map((z,i)=>'<div class="li"><div class="grow"><b class="num">'+fCorta(z.fecha)+'</b> · '+esc(z.motivo)+'</div><button class="btn peq del" onclick="OF().config.cierres.splice('+i+',1);guardar();render()">Quitar</button></div>').join('')||'<div class="small muted">Ninguno</div>')+'</div><div class="toolbar" style="margin-top:8px"><button class="btn" onclick="nuevoCierre()">+ Agregar cierre</button></div>'
+  +'<h4 style="margin-top:12px">Próximos días inhábiles (120 días)</h4><div class="small" style="max-height:180px;overflow:auto">'+prox.map(([d,m])=>'<div><b class="num">'+fCorta(d)+'</b> '+esc(DIAS[pd(d).getDay()])+' – '+esc(m)+'</div>').join('')+'</div></div>'
+  +'<div class="card"><h3>Plan y suscripción</h3><p class="small muted">Mensualidad sin permanencia. Pago con Bold.</p><div class="grid" style="gap:8px;margin-top:10px">'+PLANES.map(p=>'<div class="li" style="border:1px solid '+(p.id===o.plan?'#E0A21A':'var(--line)')+';border-radius:8px;padding:10px"><div class="grow"><b>'+p.n+'</b> '+(p.id===o.plan?pill('Plan actual','p-amb'):'')+'<div class="small muted">'+p.d+'</div></div><b class="num">'+cop(p.p)+'<span class="small muted">/mes</span></b>'+(p.id!==o.plan?'<button class="btn peq" onclick="OF().plan=\''+p.id+'\';guardar();render();toast(\'Plan cambiado (demostración)\')">Elegir</button>':'')+'</div>').join('')+'</div><div class="toolbar" style="margin-top:10px"><a class="btn amb" target="_blank" rel="noopener" href="https://skynetgenesis.com">Pagar mensualidad con Bold ↗</a></div><p class="small muted">Soporte SkyNet Genesis: '+SG.correo+' · WhatsApp 304 437 5758</p></div>'
+  +'<div class="card"><h3>Datos de demostración</h3><p class="small muted">Esta versión guarda los cambios solo en este navegador. Puede volver a los datos de ejemplo cuando quiera.</p><div class="toolbar" style="margin-top:8px"><button class="btn del" id="btn_reset" onclick="resetDemo(this)">Restablecer datos de ejemplo</button></div></div></div>';
+};
+function subirLogo(inp){const f=inp.files[0];if(!f)return;if(f.size>600000){toast('El logo debe pesar menos de 600 KB');return}const r=new FileReader();r.onload=()=>{OF().logo=r.result;guardar();render();toast('Logo actualizado')};r.readAsDataURL(f)}
+function editarOficina(nueva){const o=nueva?{ciudad:'Santa Marta',plan:'ind'}:OF();formModal(nueva?'Nueva oficina':'Datos de la oficina',[{k:'nombre',l:'Nombre de la firma o del abogado',req:1,full:1},{k:'nit',l:'NIT o cédula',req:1},{k:'ciudad',l:'Ciudad',req:1},{k:'direccion',l:'Dirección',full:1},{k:'tel',l:'Teléfono / WhatsApp'},{k:'email',l:'Correo',type:'email'}],o,d=>{if(nueva){const id=uid();DB.oficinas.push(Object.assign({id,logo:'',plan:'ind',config:{vacancia:true,semanaSanta:true,cierres:[],consecutivo:0}},d));DB.users.push({id:uid(),oficinaId:id,nombre:S.user.nombre,rol:'admin',email:d.email||'',tp:'',activo:true});S.of=id;S.user=Object.assign({},DB.users[DB.users.length-1]);S.vista='config';toast('Oficina creada. Ahora está trabajando en ella.')}else{Object.assign(o,d);toast('Datos guardados')}})}
+function nuevoCierre(){formModal('Cierre extraordinario',[{k:'fecha',l:'Fecha',type:'date',def:HOY,req:1},{k:'motivo',l:'Motivo',req:1,ph:'Ej.: Acuerdo PCSJA suspende términos'}],null,d=>{OF().config.cierres.push(d);OF().config.cierres.sort((a,b)=>a.fecha<b.fecha?-1:1);toast('Cierre agregado: los términos se recalculan con él')})}
+function resetDemo(b){if(b.dataset.ok){DB=demo();guardar();S.user=null;render();toast('Datos de ejemplo restablecidos')}else{b.dataset.ok='1';b.textContent='Confirmar: se borran los cambios'}}
+
+// ---------- normativa ----------
+VISTAS.normas=()=>{
+  const N=[['Código General del Proceso – Ley 1564 de 2012','Cómputo de términos (art. 118), ejecutoria (302), recursos (318, 322), contestación (369, 391), desistimiento tácito (317).','Calculadora de términos con días hábiles y traslado al día hábil siguiente.'],
+  ['Ley 2213 de 2022 – Justicia digital permanente','Uso de tecnologías en actuaciones judiciales; poder por mensaje de datos (art. 5); canal digital de las partes (art. 6); notificación personal electrónica que se surte 2 días hábiles después del envío (art. 8); sustentación de apelación (art. 12).','Opción «Ley 2213» en la calculadora, canal digital del cliente y plantilla de poder.'],
+  ['Ley 270 de 1996 – Estatutaria de la Administración de Justicia','Vacancia judicial colectiva del 20 de diciembre al 10 de enero (art. 146) y Semana Santa.','Descuento automático y configurable; los procesos de tutela o garantías pueden marcarse para no descontarla.'],
+  ['Ley 51 de 1983 – Festivos (Ley Emiliani)','Traslado de festivos al lunes siguiente.','Calendario de festivos calculado para cualquier año, incluidos los que dependen de la Pascua.'],
+  ['CPACA – Ley 1437 de 2011, reformada por Ley 2080 de 2021','Recursos (art. 76), traslado de la demanda (172), caducidad (164), apelación (247), notificaciones electrónicas (199).','Catálogo de términos administrativos y consulta por SAMAI.'],
+  ['Código Procesal del Trabajo y de la Seguridad Social','Contestación (art. 74), apelación (65), audiencias (77 y 80), prescripción (151).','Catálogo laboral y agenda de audiencias.'],
+  ['Decreto 2591 de 1991 – Acción de tutela','Fallo en 10 días (art. 29) e impugnación en 3 días (art. 31).','Términos de tutela que corren también en vacancia.'],
+  ['Ley 1755 de 2015 – Derecho de petición','15 días hábiles (general), 10 (documentos), 30 (consultas).','Seguimiento de asuntos extrajudiciales.'],
+  ['Ley 1123 de 2007 – Código Disciplinario del Abogado','Deberes de diligencia, secreto profesional, informar al cliente y rendir cuentas de dineros y honorarios.','Alertas de vencimiento, informe al cliente, control de honorarios y gastos.'],
+  ['Ley 1581 de 2012 y Decreto 1377 de 2013 – Protección de datos','Autorización previa, expresa e informada; derechos del titular.','Registro de la autorización por cliente, plantilla y alerta si falta.'],
+  ['Normas tributarias (DIAN)','Factura electrónica para responsables de IVA (Res. 165 de 2023); retención en la fuente por honorarios.','Cuentas de cobro con o sin IVA y control de cartera.'],
+  ['Acuerdo PCSJA23-12094 de 2023 – SIUGJ','Implementación gradual del Sistema Integrado de Gestión Judicial; conviven la Consulta Nacional Unificada, SAMAI y SIUGJ.','Cada proceso guarda su sistema de consulta y abre el portal oficial.']];
+  return head('Normativa aplicada','Normas vigentes en Colombia que la app tiene en cuenta. Verifique siempre en el despacho cualquier suspensión de términos.')
+  +'<div class="tw"><table><thead><tr><th>Norma</th><th>Qué regula</th><th>Cómo la aplica DiligencIA</th></tr></thead><tbody>'+N.map(n=>'<tr><td><b>'+esc(n[0])+'</b></td><td class="small">'+esc(n[1])+'</td><td class="small">'+esc(n[2])+'</td></tr>').join('')+'</tbody></table></div>'
+  +'<div class="note amb" style="margin-top:14px">La calculadora es una herramienta de apoyo. El abogado responsable debe verificar los términos frente a la providencia, los acuerdos del Consejo Superior de la Judicatura y el horario del despacho.</div>';
+};
+
+// ---------- portal del cliente ----------
+VISTAS.portal=()=>{
+  const c=byId('clientes',S.user.clienteId);const ps=visibles('procesos');const ag=visibles('agenda').filter(a=>a.fecha>=HOY);const bs=visibles('cobros');const o=OF();
+  return head('Bienvenido(a), '+esc(c.nombre),'Consulte el estado de sus asuntos con '+esc(o.nombre)+'.','<a class="btn wa" target="_blank" rel="noopener" href="'+waLink(o.tel,'Hola, soy '+c.nombre+'. Quisiera consultar sobre mis procesos.')+'">Escribir a mi abogado</a><button class="btn" onclick="docInforme(\''+c.id+'\')">Descargar informe</button>')
+  +'<div class="grid g4">'+kpi('Procesos',ps.filter(p=>p.estado==='Activo').length,'en curso')+kpi('Próximas audiencias',ag.length,ag[0]?fDia(ag[0].fecha):'')+kpi('Saldo pendiente',cop(bs.reduce((s,b)=>s+saldoCobro(b),0)),'')+'</div>'
+  +ps.map(p=>'<div class="card" style="margin-top:14px"><h3>'+esc(p.clase)+'</h3><p class="small muted">'+esc(p.despacho)+' · Radicado '+radHTML(p.radicado)+'</p><p class="small">Etapa actual: <b>'+esc(p.etapa)+'</b> · Abogado: '+esc(nomUser(p.abogadoId))+'</p><div class="list">'+p.actuaciones.filter(a=>a.pub).sort((a,b)=>a.f<b.f?1:-1).map(a=>'<div class="li">'+fechaBox(a.f)+'<div class="grow small">'+esc(a.t)+'</div></div>').join('')+'</div></div>').join('')
+  +(ag.length?'<h3 style="margin:18px 0 10px">Próximas audiencias y citas</h3><div class="card"><div class="list">'+ag.map(a=>'<div class="li">'+fechaBox(a.fecha)+'<div class="grow"><b>'+esc(a.titulo)+'</b><div class="small muted">'+fDia(a.fecha)+' '+esc(a.hora)+' · '+esc(a.lugar)+'</div></div></div>').join('')+'</div></div>':'')
+  +'<h3 style="margin:18px 0 10px">Mis cuentas</h3>'+tablaCobros(bs);
+};
+
+// ===================== DiligencIA · biblioteca de documentos =====================
+const PH=t=>'<mark class="ph">['+esc(t)+']</mark>';
+function ctxProc(pid){const p=byId('procesos',pid);const c=p?byId('clientes',p.clienteId):null;const ab=p?(byId('users',p.abogadoId)||{}):{};return {p,c,ab,o:OF()}}
+function ctxCli(cid){const c=byId('clientes',cid);const o=OF();const ab=de('users').find(u=>u.id===S.user.id&&['admin','abogado'].includes(u.rol))||de('users').find(u=>u.rol==='admin')||{};return {c,ab,o,p:null}}
+const refProc=p=>'<p>Referencia: <b>'+esc(p.clase)+'</b><br>Demandante: '+esc(p.demandante)+'<br>Demandado: '+esc(p.demandado)+'<br>Radicado: '+(p.radicado?esc(p.radicado):PH('radicado'))+'</p>';
+const aDespacho=p=>'<p>Señor(a) Juez<br><b>'+esc(p.despacho)+'</b><br>E. S. D.</p>';
+const firmaAb=(ab)=>'<div class="firma"><div>'+esc(ab.nombre||'')+'<br>C.C. '+PH('cédula')+'<br>T.P. '+esc(ab.tp||'')+' del C. S. de la J.<br>'+esc(ab.email||'')+'</div></div>';
+const firmaCli=(c)=>'<div class="firma"><div>'+esc(c.nombre)+'<br>'+esc(c.doc)+'<br>'+esc(c.canal||c.email)+'</div></div>';
+const yoAb=(ab,c,p)=>'<b>'+esc(ab.nombre||'')+'</b>, abogado(a) en ejercicio, identificado(a) con la tarjeta profesional '+esc(ab.tp||'')+' del Consejo Superior de la Judicatura, actuando como apoderado(a) de <b>'+esc(c.nombre)+'</b>'+(p?' ('+esc(p.rolCliente.toLowerCase())+')':'')+',';
+
+const DOCS=[
+ // ---------- Poderes y mandato ----------
+ {id:'poder',cat:'Poderes y mandato',n:'Poder especial',d:'Por mensaje de datos (Ley 2213, art. 5) con correo inscrito en el SIRNA.',b:'proc',f:pid=>docPoder(pid)},
+ {id:'sustitucion',cat:'Poderes y mandato',n:'Sustitución de poder',d:'CGP art. 75. El apoderado sustituye en otro abogado.',b:'proc',f:pid=>{const {p,c,ab}=ctxProc(pid);return ['Sustitución de poder',aDespacho(p)+refProc(p)+'<p>'+yoAb(ab,c,p)+' según poder que obra en el expediente, manifiesto que <b>SUSTITUYO</b> el poder a mí conferido en el(la) abogado(a) '+PH('nombre del sustituto')+', identificado(a) con C.C. '+PH('cédula')+' y T.P. '+PH('tarjeta profesional')+', con correo inscrito en el SIRNA '+PH('correo')+', con las mismas facultades a mí otorgadas, de conformidad con el artículo 75 del Código General del Proceso.</p><p>Me reservo la facultad de reasumir el poder en cualquier momento.</p>'+firmaAb(ab)+'<div class="firma"><div>Acepto,<br>'+PH('nombre del sustituto')+'<br>T.P. '+PH('tarjeta')+'</div></div>']}},
+ {id:'renuncia',cat:'Poderes y mandato',n:'Renuncia al poder',d:'CGP art. 76. Incluye la constancia de comunicación al poderdante.',b:'proc',f:pid=>{const {p,c,ab}=ctxProc(pid);return ['Renuncia al poder',aDespacho(p)+refProc(p)+'<p>'+yoAb(ab,c,p)+' de manera respetuosa presento <b>RENUNCIA</b> al poder a mí conferido dentro del proceso de la referencia, de conformidad con el artículo 76 del Código General del Proceso.</p><p>Para los efectos de la norma citada, adjunto la comunicación enviada a mi poderdante al correo electrónico '+esc(c.canal||c.email)+' el día '+PH('fecha de envío')+'. La renuncia produce efectos cinco (5) días después de presentado este memorial en el juzgado, acompañado de dicha comunicación.</p><p>Manifiesto que me encuentro '+PH('a paz y salvo / con honorarios pendientes')+' por concepto de honorarios.</p>'+firmaAb(ab)]}},
+ {id:'revocatoria',cat:'Poderes y mandato',n:'Revocatoria de poder',d:'El cliente revoca el poder y designa nuevo apoderado (CGP art. 76).',b:'proc',f:pid=>{const {p,c,ab}=ctxProc(pid);return ['Revocatoria de poder',aDespacho(p)+refProc(p)+'<p><b>'+esc(c.nombre)+'</b>, identificado(a) con '+esc(c.doc)+', obrando en calidad de '+esc(p.rolCliente.toLowerCase())+', manifiesto que <b>REVOCO</b> el poder conferido al(la) abogado(a) '+PH('nombre del apoderado anterior')+' y, en su lugar, confiero poder especial a <b>'+esc(ab.nombre||'')+'</b>, T.P. '+esc(ab.tp||'')+', correo SIRNA '+esc(ab.email||'')+', con las facultades del artículo 77 del Código General del Proceso.</p><p>Este documento se otorga por mensaje de datos conforme al artículo 5.º de la Ley 2213 de 2022.</p>'+firmaCli(c)+'<div class="firma"><div>Acepto,<br>'+esc(ab.nombre||'')+'<br>T.P. '+esc(ab.tp||'')+'</div></div>']}},
+ // ---------- Relación con el cliente ----------
+ {id:'propuesta',cat:'Relación con el cliente',n:'Propuesta de honorarios',d:'Cotización formal del servicio antes de firmar contrato.',b:'cli',f:cid=>{const {c,o}=ctxCli(cid);return ['Propuesta de servicios profesionales','<p>Señor(a)<br><b>'+esc(c.nombre)+'</b><br>'+esc(c.dir)+'</p><p>Respetado(a) cliente: de acuerdo con la consulta realizada el '+PH('fecha de la consulta')+', presentamos nuestra propuesta:</p><p><b>1. Asunto.</b> '+PH('descripción del caso')+'</p><p><b>2. Alcance del servicio.</b> '+PH('actuaciones incluidas: estudio, demanda, audiencias, recursos, etc.')+'</p><p><b>3. Honorarios.</b> '+PH('valor y modalidad: suma fija / por etapas / cuota litis')+'. Forma de pago: '+PH('anticipo y cuotas')+'.</p><p><b>4. Gastos del proceso.</b> No incluidos: aranceles, notificaciones, pólizas, peritos y auxiliares de la justicia, que asume el cliente.</p><p><b>5. Vigencia de la propuesta.</b> 30 días calendario.</p><p>Quedamos atentos a sus comentarios.</p><div class="firma"><div>'+esc(o.nombre)+'</div></div>']}},
+ {id:'contrato',cat:'Relación con el cliente',n:'Contrato de prestación de servicios',d:'Objeto, honorarios, gastos, deberes (Ley 1123/2007) y datos personales.',b:'proc',f:pid=>docContrato(pid)},
+ {id:'autorizacion',cat:'Relación con el cliente',n:'Autorización de tratamiento de datos',d:'Previa, expresa e informada (Ley 1581/2012).',b:'cli',f:cid=>docAutorizacion(cid)},
+ {id:'informe',cat:'Relación con el cliente',n:'Informe al cliente (rendición de cuentas)',d:'Estado de cada proceso, actuaciones, próximas diligencias y cuenta.',b:'cli',f:cid=>docInforme(cid)},
+ {id:'asesoria',cat:'Relación con el cliente',n:'Constancia de asesoría jurídica',d:'Deja por escrito lo consultado y lo recomendado.',b:'cli',f:cid=>{const {c,ab}=ctxCli(cid);return ['Constancia de asesoría jurídica','<p>Fecha: '+fLarga(HOY)+'<br>Consultante: <b>'+esc(c.nombre)+'</b> ('+esc(c.doc)+')<br>Abogado(a): '+esc(ab.nombre||'')+'</p><p><b>Asunto consultado:</b> '+PH('resumen de la consulta')+'</p><p><b>Documentos revisados:</b> '+PH('lista de documentos')+'</p><p><b>Concepto y recomendaciones:</b> '+PH('concepto jurídico')+'</p><p><b>Términos a tener en cuenta:</b> '+PH('caducidad / prescripción / plazos')+'</p><p>El presente concepto se emite con base en la información suministrada por el consultante y no constituye garantía de resultado. La información se trata bajo secreto profesional (Ley 1123 de 2007).</p><div class="firma"><div>'+esc(ab.nombre||'')+'<br>T.P. '+esc(ab.tp||'')+'</div><div>Recibido,<br>'+esc(c.nombre)+'</div></div>']}},
+ {id:'entrega',cat:'Relación con el cliente',n:'Acta de entrega y recibo de documentos',d:'Registro de documentos originales recibidos o devueltos al cliente.',b:'cli',f:cid=>{const {c,o}=ctxCli(cid);return ['Acta de entrega y recibo de documentos','<p>En '+esc(o.ciudad)+', el '+fLarga(HOY)+', se deja constancia de que <b>'+esc(c.nombre)+'</b> ('+esc(c.doc)+') '+PH('entrega a / recibe de')+' <b>'+esc(o.nombre)+'</b> los siguientes documentos:</p><table><thead><tr><th>#</th><th>Documento</th><th>Original / copia</th><th>Folios</th></tr></thead><tbody>'+[1,2,3,4,5].map(i=>'<tr><td>'+i+'</td><td>'+PH('documento')+'</td><td>'+PH('O/C')+'</td><td>'+PH('n.º')+'</td></tr>').join('')+'</tbody></table><div class="firma"><div>Entrega</div><div>Recibe</div></div>']}},
+ {id:'pazysalvo',cat:'Relación con el cliente',n:'Paz y salvo de honorarios',d:'Certifica que el cliente no tiene saldos pendientes.',b:'cli',f:cid=>{const {c,o}=ctxCli(cid);const sal=de('cobros').filter(b=>b.clienteId===cid).reduce((s,b)=>s+saldoCobro(b),0);return ['Paz y salvo',(sal?'<p class="small" style="color:#C0392B"><b>Atención:</b> el cliente registra un saldo de '+cop(sal)+' en la app. Verifique antes de expedir.</p>':'')+'<p><b>'+esc(o.nombre)+'</b>, identificado(a) con NIT/CC '+esc(o.nit)+', certifica que <b>'+esc(c.nombre)+'</b>, identificado(a) con '+esc(c.doc)+', se encuentra a <b>PAZ Y SALVO</b> por concepto de honorarios profesionales y gastos relacionados con '+PH('asunto o proceso')+', a la fecha '+fLarga(HOY)+'.</p><p>Se expide a solicitud del interesado.</p><div class="firma"><div>'+esc(o.nombre)+'</div></div>']}},
+ {id:'recibo',cat:'Relación con el cliente',n:'Recibo de pago',d:'Comprobante de abonos de una cuenta de cobro.',b:'cobro',f:bid=>{const b=byId('cobros',bid);const c=byId('clientes',b.clienteId);const o=OF();const ps=DB.pagos.filter(x=>x.cobroId===bid);const pag=ps.reduce((s,x)=>s+x.valor,0);return ['Recibo de pago – '+b.numero,'<p>'+esc(o.nombre)+' recibió de <b>'+esc(c.nombre)+'</b> ('+esc(c.doc)+') la suma de <b>'+numLetras(pag)+' pesos m/cte ('+cop(pag)+')</b> como abono a la cuenta de cobro '+esc(b.numero)+' por concepto de: '+esc(b.concepto)+'.</p><table><thead><tr><th>Fecha</th><th>Medio</th><th style="text-align:right">Valor</th></tr></thead><tbody>'+(ps.map(x=>'<tr><td>'+fCorta(x.fecha)+'</td><td>'+esc(x.medio)+'</td><td style="text-align:right">'+cop(x.valor)+'</td></tr>').join('')||'<tr><td colspan="3">Sin pagos registrados</td></tr>')+'<tr><td colspan="2"><b>Saldo pendiente</b></td><td style="text-align:right"><b>'+cop(saldoCobro(b))+'</b></td></tr></tbody></table><div class="firma"><div>Recibido por<br>'+esc(o.nombre)+'</div></div>']}},
+ // ---------- Memoriales y escritos judiciales ----------
+ {id:'demanda',cat:'Memoriales y escritos judiciales',n:'Demanda (estructura CGP art. 82)',d:'Esqueleto con todos los requisitos formales y los de la Ley 2213.',b:'proc',f:pid=>{const {p,c,ab}=ctxProc(pid);return ['Demanda – '+p.clase,aDespacho(p)+'<p>Referencia: <b>'+esc(p.clase)+'</b><br>Demandante: '+esc(p.demandante)+'<br>Demandado: '+esc(p.demandado)+'</p><p>'+yoAb(ab,c,p)+' según poder adjunto, presento <b>DEMANDA</b> en contra de '+esc(p.demandado)+', identificado(a) con '+PH('documento')+', domiciliado(a) en '+PH('ciudad')+', con fundamento en lo siguiente:</p><h4>I. PARTES</h4><p>Demandante: '+esc(c.nombre)+', '+esc(c.doc)+', domicilio '+esc(c.dir)+'.<br>Demandado: '+esc(p.demandado)+', '+PH('documento y domicilio')+'. Representante legal (si aplica): '+PH('nombre')+'.</p><h4>II. PRETENSIONES</h4><p>1. '+PH('pretensión principal')+'<br>2. '+PH('pretensión consecuencial')+'<br>3. Condenar en costas y agencias en derecho a la parte demandada.</p><h4>III. HECHOS</h4><p>1. '+PH('hecho')+'<br>2. '+PH('hecho')+'<br>3. '+PH('hecho')+'</p><h4>IV. FUNDAMENTOS DE DERECHO</h4><p>'+PH('normas sustanciales y procesales aplicables')+'</p><h4>V. JURAMENTO ESTIMATORIO (CGP art. 206)</h4><p>'+PH('estimación razonada bajo juramento, si se piden perjuicios o frutos')+'</p><h4>VI. PRUEBAS</h4><p>Documentales: '+PH('lista')+'<br>Testimoniales: '+PH('nombre, dirección y objeto del testimonio')+'<br>Otras: '+PH('dictámenes, inspección, etc.')+'</p><h4>VII. CUANTÍA Y COMPETENCIA</h4><p>Estimo la cuantía en '+(p.cuantia?cop(p.cuantia):PH('valor'))+'. Es usted competente por '+PH('naturaleza, cuantía y domicilio / lugar de cumplimiento')+'.</p><h4>VIII. PROCEDIMIENTO</h4><p>'+PH('verbal / verbal sumario / ejecutivo / etc.')+'</p><h4>IX. ANEXOS</h4><p>Poder; documentos relacionados en pruebas; certificado de existencia y representación (si aplica); constancia de conciliación extrajudicial como requisito de procedibilidad (cuando aplique, Ley 2220 de 2022); constancia del envío simultáneo de la demanda al demandado (Ley 2213, art. 6), salvo que se pidan medidas cautelares.</p><h4>X. NOTIFICACIONES</h4><p>Demandante: '+esc(c.canal||c.email)+'. Demandado: '+PH('correo electrónico')+'; manifiesto bajo juramento que esta dirección corresponde a la utilizada por la persona a notificar, la obtuve de '+PH('fuente')+' y aporto evidencia (Ley 2213, art. 8). Apoderado: '+esc(ab.email||'')+' (inscrito en el SIRNA).</p>'+firmaAb(ab)]}},
+ {id:'contestacion',cat:'Memoriales y escritos judiciales',n:'Contestación de demanda (CGP art. 96)',d:'Pronunciamiento sobre hechos y pretensiones, excepciones y pruebas.',b:'proc',f:pid=>{const {p,c,ab}=ctxProc(pid);return ['Contestación de la demanda',aDespacho(p)+refProc(p)+'<p>'+yoAb(ab,c,p)+' dentro del término legal, doy <b>CONTESTACIÓN</b> a la demanda en los siguientes términos:</p><h4>I. A LAS PRETENSIONES</h4><p>Me opongo a todas y cada una de las pretensiones por carecer de fundamento fáctico y jurídico, por las razones que se exponen.</p><h4>II. A LOS HECHOS</h4><p>Al 1.º: '+PH('es cierto / no es cierto / no me consta, y por qué')+'<br>Al 2.º: '+PH('pronunciamiento')+'</p><h4>III. EXCEPCIONES DE MÉRITO</h4><p>1. '+PH('nombre de la excepción')+': '+PH('fundamento')+'<br>2. Genérica: solicito declarar las excepciones que resulten probadas (CGP art. 282).</p><h4>IV. OBJECIÓN AL JURAMENTO ESTIMATORIO</h4><p>'+PH('si aplica, especificar razonadamente la inexactitud (CGP art. 206)')+'</p><h4>V. PRUEBAS</h4><p>'+PH('documentales, testimoniales, interrogatorio de parte')+'</p><h4>VI. NOTIFICACIONES</h4><p>Demandado: '+esc(c.canal||c.email)+'. Apoderado: '+esc(ab.email||'')+'.</p><p>Copia de este escrito se envía simultáneamente a las demás partes (CGP art. 78-14 y Ley 2213, art. 3).</p>'+firmaAb(ab)]}},
+ {id:'reposicion',cat:'Memoriales y escritos judiciales',n:'Recurso de reposición y en subsidio apelación',d:'CGP arts. 318 y 322 (3 días).',b:'proc',f:pid=>{const {p,c,ab}=ctxProc(pid);return ['Recurso de reposición y en subsidio apelación',aDespacho(p)+refProc(p)+'<p>'+yoAb(ab,c,p)+' dentro del término legal interpongo recurso de <b>REPOSICIÓN y en subsidio APELACIÓN</b> contra el auto de fecha '+PH('fecha del auto')+', notificado por estado del '+PH('fecha')+', mediante el cual '+PH('decisión recurrida')+'.</p><h4>I. PETICIÓN</h4><p>Revocar el auto recurrido y, en su lugar, '+PH('lo que se pide')+'. En caso de no reponerse, conceder el recurso de apelación ante el superior.</p><h4>II. SUSTENTACIÓN</h4><p>'+PH('razones de inconformidad (CGP art. 318 y 322)')+'</p><h4>III. PROCEDENCIA DE LA APELACIÓN</h4><p>El auto es apelable conforme al artículo 321 numeral '+PH('n.º')+' del CGP.</p>'+firmaAb(ab)]}},
+ {id:'impulso',cat:'Memoriales y escritos judiciales',n:'Memorial de impulso procesal',d:'Solicita al despacho resolver una petición pendiente.',b:'proc',f:pid=>{const {p,c,ab}=ctxProc(pid);return ['Solicitud de impulso procesal',aDespacho(p)+refProc(p)+'<p>'+yoAb(ab,c,p)+' respetuosamente solicito al despacho dar impulso al proceso y '+PH('resolver la solicitud radicada el ... / fijar fecha de audiencia / ordenar el emplazamiento / etc.')+', teniendo en cuenta que desde '+PH('fecha')+' no se registra actuación.</p><p>Lo anterior con fundamento en los deberes del juez de impulsar el proceso y velar por su rápida solución (CGP arts. 8 y 42-1) y el término de duración del proceso (CGP art. 121).</p>'+firmaAb(ab)]}},
+ {id:'notif8',cat:'Memoriales y escritos judiciales',n:'Notificación personal por mensaje de datos',d:'Comunicación al demandado (Ley 2213, art. 8) con advertencia de términos.',b:'proc',f:pid=>{const {p,c,ab}=ctxProc(pid);return ['Notificación personal – Ley 2213 de 2022, art. 8','<p>Señor(a)<br><b>'+esc(p.demandado)+'</b><br>Correo: '+PH('correo del notificado')+'</p>'+'<p>Despacho: <b>'+esc(p.despacho)+'</b><br>Proceso: '+esc(p.clase)+'<br>Radicado: '+(p.radicado?esc(p.radicado):PH('radicado'))+'<br>Demandante: '+esc(p.demandante)+'</p><p>Por medio de este mensaje de datos le <b>NOTIFICO PERSONALMENTE</b> el auto de fecha '+PH('fecha')+' que '+PH('admite la demanda / libra mandamiento de pago')+'. Se adjuntan la providencia, la demanda y sus anexos.</p><p>La notificación se entenderá realizada una vez transcurridos <b>dos (2) días hábiles</b> siguientes al envío de este mensaje, y los términos empezarán a correr a partir del día siguiente al de la notificación (Ley 2213 de 2022, art. 8). Usted cuenta con '+PH('n.º de días')+' días para '+PH('contestar / pagar / proponer excepciones')+'.</p><p>Correo del despacho para radicar memoriales: '+PH('correo del juzgado')+'.</p><div class="firma"><div>'+esc(ab.nombre||'')+'<br>Apoderado(a) de la parte demandante<br>'+esc(ab.email||'')+'</div></div>']}},
+ {id:'acredita',cat:'Memoriales y escritos judiciales',n:'Memorial que acredita la notificación',d:'Aporta constancia de envío y acuse de recibo al despacho.',b:'proc',f:pid=>{const {p,c,ab}=ctxProc(pid);return ['Memorial – acredita notificación personal',aDespacho(p)+refProc(p)+'<p>'+yoAb(ab,c,p)+' informo al despacho que el día '+PH('fecha de envío')+' se remitió al demandado '+esc(p.demandado)+', al correo '+PH('correo')+', la notificación personal de que trata el artículo 8.º de la Ley 2213 de 2022, junto con la providencia a notificar, la demanda y sus anexos.</p><p>Aporto: (i) constancia de envío; (ii) acuse de recibo o constancia de acceso del destinatario al mensaje, generado el '+PH('fecha')+'.</p><p>Solicito tener por notificado al demandado y contabilizar el término de traslado desde el día hábil siguiente al vencimiento de los dos días hábiles posteriores al envío.</p>'+firmaAb(ab)]}},
+ {id:'aplazamiento',cat:'Memoriales y escritos judiciales',n:'Solicitud de aplazamiento de audiencia',d:'Con justificación y prueba siquiera sumaria.',b:'proc',f:pid=>{const {p,c,ab}=ctxProc(pid);const a=de('agenda').filter(x=>x.procesoId===pid&&x.fecha>=HOY).sort((x,y)=>x.fecha<y.fecha?-1:1)[0];return ['Solicitud de aplazamiento de audiencia',aDespacho(p)+refProc(p)+'<p>'+yoAb(ab,c,p)+' solicito respetuosamente el <b>APLAZAMIENTO</b> de la audiencia programada para el '+(a?fLarga(a.fecha)+' a las '+esc(a.hora):PH('fecha y hora'))+', por la siguiente justa causa: '+PH('motivo')+', de la cual aporto prueba siquiera sumaria (CGP art. 372, num. 3).</p><p>Solicito fijar nueva fecha en la oportunidad que el despacho considere.</p>'+firmaAb(ab)]}},
+ {id:'expediente',cat:'Memoriales y escritos judiciales',n:'Solicitud de acceso al expediente digital',d:'Pide el enlace o copia del expediente electrónico.',b:'proc',f:pid=>{const {p,c,ab}=ctxProc(pid);return ['Solicitud de acceso al expediente',aDespacho(p)+refProc(p)+'<p>'+yoAb(ab,c,p)+' solicito el acceso al <b>expediente digital</b> del proceso de la referencia (enlace de consulta) o la remisión de copia de '+PH('las piezas procesales requeridas')+' al correo '+esc(ab.email||'')+', inscrito en el SIRNA.</p><p>Fundamento: Ley 2213 de 2022 y CGP art. 123 (examen de expedientes).</p>'+firmaAb(ab)]}},
+ {id:'medidas',cat:'Memoriales y escritos judiciales',n:'Solicitud de medidas cautelares',d:'Embargo y secuestro (CGP art. 599) o inscripción de demanda (art. 590).',b:'proc',f:pid=>{const {p,c,ab}=ctxProc(pid);return ['Solicitud de medidas cautelares',aDespacho(p)+refProc(p)+'<p>'+yoAb(ab,c,p)+' solicito decretar las siguientes <b>MEDIDAS CAUTELARES</b>:</p><p>1. El embargo y retención de los dineros que el demandado '+esc(p.demandado)+' tenga en cuentas de ahorro, corrientes o CDT en '+PH('entidades financieras')+', limitando la medida a '+PH('valor')+'.<br>2. El embargo y posterior secuestro del inmueble con matrícula inmobiliaria '+PH('n.º')+' de la Oficina de Registro de '+PH('ciudad')+'.<br>3. '+PH('otra medida')+'</p><p>Fundamento: CGP arts. '+PH('590 / 593 / 599')+'. '+PH('Prestaré la caución que el despacho fije, cuando sea exigible.')+'</p>'+firmaAb(ab)]}},
+ {id:'liquidacion',cat:'Memoriales y escritos judiciales',n:'Liquidación del crédito',d:'Ejecutivos: capital, intereses y abonos (CGP art. 446).',b:'proc',f:pid=>{const {p,c,ab}=ctxProc(pid);return ['Liquidación del crédito',aDespacho(p)+refProc(p)+'<p>'+yoAb(ab,c,p)+' en cumplimiento del artículo 446 del CGP presento la <b>LIQUIDACIÓN DEL CRÉDITO</b>:</p><table><thead><tr><th>Concepto</th><th>Desde</th><th>Hasta</th><th>Tasa</th><th style="text-align:right">Valor</th></tr></thead><tbody><tr><td>Capital</td><td></td><td></td><td></td><td style="text-align:right">'+PH('valor')+'</td></tr><tr><td>Intereses moratorios</td><td>'+PH('fecha')+'</td><td>'+fCorta(HOY)+'</td><td>'+PH('tasa certificada por la Superfinanciera')+'</td><td style="text-align:right">'+PH('valor')+'</td></tr><tr><td>Menos abonos</td><td></td><td></td><td></td><td style="text-align:right">'+PH('valor')+'</td></tr><tr><td><b>Total</b></td><td></td><td></td><td></td><td style="text-align:right"><b>'+PH('total')+'</b></td></tr></tbody></table><p>Solicito correr traslado y aprobarla.</p>'+firmaAb(ab)]}},
+ // ---------- Constitucional y administrativo ----------
+ {id:'peticion',cat:'Constitucional y administrativo',n:'Derecho de petición',d:'Constitución art. 23 y Ley 1755 de 2015 (15 días hábiles).',b:'cli',f:cid=>{const {c,ab}=ctxCli(cid);return ['Derecho de petición','<p>Señores<br><b>'+PH('entidad o empresa')+'</b><br>'+PH('dirección o correo de radicación')+'</p><p>Asunto: Derecho de petición – '+PH('tema')+'</p><p><b>'+esc(c.nombre)+'</b>, identificado(a) con '+esc(c.doc)+', en ejercicio del derecho fundamental de petición consagrado en el artículo 23 de la Constitución Política y regulado por la Ley 1755 de 2015, respetuosamente solicito:</p><h4>PETICIONES</h4><p>1. '+PH('petición concreta')+'<br>2. '+PH('petición')+'</p><h4>HECHOS</h4><p>1. '+PH('hecho')+'<br>2. '+PH('hecho')+'</p><h4>TÉRMINO DE RESPUESTA</h4><p>De acuerdo con el artículo 14 de la Ley 1755 de 2015, la respuesta debe darse dentro de los quince (15) días hábiles siguientes a la recepción (diez para solicitudes de documentos o información y treinta para consultas).</p><h4>NOTIFICACIONES</h4><p>'+esc(c.dir)+' · '+esc(c.canal||c.email)+' · '+esc(c.tel)+'</p>'+firmaCli(c)]}},
+ {id:'tutela',cat:'Constitucional y administrativo',n:'Acción de tutela',d:'Decreto 2591 de 1991 (requisitos del art. 14 y juramento del art. 37).',b:'cli',f:cid=>{const {c}=ctxCli(cid);return ['Acción de tutela','<p>Señor(a)<br><b>JUEZ '+PH('reparto')+'</b><br>E. S. D.</p><p>Referencia: Acción de tutela<br>Accionante: '+esc(c.nombre)+'<br>Accionado: '+PH('entidad o particular')+'<br>Derechos vulnerados: '+PH('salud, vida digna, petición, debido proceso, etc.')+'</p><p><b>'+esc(c.nombre)+'</b>, identificado(a) con '+esc(c.doc)+', '+PH('actuando en nombre propio / por medio de apoderado')+', interpongo <b>ACCIÓN DE TUTELA</b> de conformidad con el artículo 86 de la Constitución Política y el Decreto 2591 de 1991.</p><h4>I. HECHOS</h4><p>1. '+PH('hecho')+'<br>2. '+PH('hecho')+'</p><h4>II. DERECHOS FUNDAMENTALES VULNERADOS</h4><p>'+PH('derechos y explicación de la vulneración')+'</p><h4>III. PRETENSIONES</h4><p>1. Tutelar los derechos fundamentales invocados.<br>2. Ordenar a '+PH('accionado')+' que en el término de cuarenta y ocho (48) horas '+PH('orden concreta')+'.</p><h4>IV. MEDIDA PROVISIONAL (art. 7)</h4><p>'+PH('si aplica, por qué es urgente')+'</p><h4>V. PROCEDENCIA</h4><p>Subsidiariedad: '+PH('no existe otro medio eficaz / perjuicio irremediable')+'. Inmediatez: los hechos ocurrieron el '+PH('fecha')+'.</p><h4>VI. PRUEBAS</h4><p>'+PH('documentos')+'</p><h4>VII. JURAMENTO</h4><p>Bajo la gravedad del juramento manifiesto que no he presentado otra acción de tutela por los mismos hechos y derechos (Decreto 2591 de 1991, art. 37).</p><h4>VIII. NOTIFICACIONES</h4><p>Accionante: '+esc(c.dir)+' · '+esc(c.canal||c.email)+'. Accionado: '+PH('dirección y correo')+'.</p>'+firmaCli(c)]}},
+ {id:'desacato',cat:'Constitucional y administrativo',n:'Incidente de desacato',d:'Por incumplimiento del fallo de tutela (Decreto 2591, arts. 27 y 52).',b:'proc',f:pid=>{const {p,c,ab}=ctxProc(pid);return ['Incidente de desacato',aDespacho(p)+refProc(p)+'<p><b>'+esc(c.nombre)+'</b>, identificado(a) con '+esc(c.doc)+', solicito iniciar <b>INCIDENTE DE DESACATO</b> contra '+esc(p.demandado)+' y su representante '+PH('nombre y cargo del responsable')+', por el incumplimiento del fallo de tutela proferido el '+PH('fecha del fallo')+', que ordenó '+PH('orden impartida')+' en el término de '+PH('plazo')+'.</p><p>A la fecha la entidad no ha cumplido: '+PH('descripción del incumplimiento')+'.</p><p>Solicito requerir al superior del responsable (art. 27), declarar el desacato e imponer las sanciones del artículo 52 del Decreto 2591 de 1991, sin perjuicio del cumplimiento inmediato de la orden.</p>'+firmaCli(c)]}},
+ {id:'conciliacion',cat:'Constitucional y administrativo',n:'Solicitud de conciliación extrajudicial',d:'Requisito de procedibilidad cuando aplique (Ley 2220 de 2022).',b:'cli',f:cid=>{const {c,ab}=ctxCli(cid);return ['Solicitud de conciliación extrajudicial','<p>Señores<br><b>'+PH('Centro de conciliación / Procuraduría / conciliador')+'</b></p><p><b>'+esc(c.nombre)+'</b> ('+esc(c.doc)+'), '+PH('por medio de apoderado')+', solicito citar a audiencia de <b>CONCILIACIÓN EXTRAJUDICIAL</b> a '+PH('convocado, documento, dirección y correo')+', conforme a la Ley 2220 de 2022 (Estatuto de Conciliación).</p><h4>HECHOS</h4><p>1. '+PH('hecho')+'</p><h4>PRETENSIONES</h4><p>1. '+PH('pretensión')+'</p><h4>CUANTÍA</h4><p>'+PH('estimación')+'</p><h4>PRUEBAS</h4><p>'+PH('documentos')+'</p><h4>NOTIFICACIONES</h4><p>Convocante: '+esc(c.canal||c.email)+' · Apoderado: '+esc(ab.email||'')+'</p>'+firmaCli(c)]}},
+ {id:'recursoAdm',cat:'Constitucional y administrativo',n:'Recursos contra acto administrativo',d:'Reposición y en subsidio apelación (CPACA arts. 74 a 77, 10 días).',b:'cli',f:cid=>{const {c}=ctxCli(cid);return ['Recurso de reposición y en subsidio apelación','<p>Señores<br><b>'+PH('autoridad que expidió el acto')+'</b></p><p>Referencia: Recursos contra '+PH('resolución n.º ... del ...')+'</p><p><b>'+esc(c.nombre)+'</b>, identificado(a) con '+esc(c.doc)+', dentro de los diez (10) días siguientes a la notificación, interpongo recurso de <b>REPOSICIÓN y en subsidio APELACIÓN</b> contra el acto de la referencia, notificado el '+PH('fecha')+'.</p><h4>I. MOTIVOS DE INCONFORMIDAD</h4><p>'+PH('argumentos (CPACA art. 77-2)')+'</p><h4>II. PETICIÓN</h4><p>Revocar '+PH('/ modificar / aclarar')+' el acto y, en su lugar, '+PH('decisión pedida')+'.</p><h4>III. PRUEBAS</h4><p>'+PH('pruebas que se pretende hacer valer')+'</p><h4>IV. NOTIFICACIONES</h4><p>Autorizo la notificación electrónica al correo '+esc(c.canal||c.email)+' (CPACA art. 56).</p>'+firmaCli(c)]}},
+];
+const CATS_DOC=[...new Set(DOCS.map(d=>d.cat))];
+const VARS_PL=['cliente','cliente_documento','cliente_direccion','cliente_correo','cliente_telefono','radicado','despacho','clase','demandante','demandado','etapa','abogado','tarjeta','abogado_correo','oficina','oficina_nit','ciudad','fecha'];
+function abrirDoc(id,ref){
+  if(!ref){toast('Seleccione el cliente o el proceso');return}
+  const t=DOCS.find(d=>d.id===id);const r=t.f(ref);if(!r)return; // las plantillas originales abren su propia ventana
+  const [titulo,cuerpo]=r;verDoc(titulo,marcoDoc(titulo,'Fecha: '+fCorta(HOY),cuerpo));
+}
+function abrirPlantillaPropia(id,ref){
+  const pl=byId('plantillas',id);let c,p,ab;
+  if(pl.base==='proc'){({p,c,ab}=ctxProc(ref))}else{({c,ab}=ctxCli(ref))}
+  const v={cliente:c.nombre,cliente_documento:c.doc,cliente_direccion:c.dir,cliente_correo:c.canal||c.email,cliente_telefono:c.tel,radicado:p?p.radicado:'',despacho:p?p.despacho:'',clase:p?p.clase:'',demandante:p?p.demandante:'',demandado:p?p.demandado:'',etapa:p?p.etapa:'',abogado:ab.nombre||'',tarjeta:ab.tp||'',abogado_correo:ab.email||'',oficina:OF().nombre,oficina_nit:OF().nit,ciudad:OF().ciudad,fecha:fLarga(HOY)};
+  const html=esc(pl.texto).replace(/\{\{\s*(\w+)\s*\}\}/g,(m,k)=>k in v?(v[k]?'<b>'+esc(v[k])+'</b>':PH(k)):m).replace(/\[([^\]]+)\]/g,'<mark class="ph">[$1]</mark>').split(/\n{2,}/).map(par=>'<p>'+par.replace(/\n/g,'<br>')+'</p>').join('');
+  verDoc(pl.nombre,marcoDoc(pl.nombre,'Fecha: '+fCorta(HOY),html));
+}
+function editarPlantilla(id){
+  const pl=id?byId('plantillas',id):{base:'proc',texto:'Señor(a) Juez\n{{despacho}}\nE. S. D.\n\nReferencia: {{clase}}\nDemandante: {{demandante}}\nDemandado: {{demandado}}\nRadicado: {{radicado}}\n\n{{abogado}}, apoderado(a) de {{cliente}}, respetuosamente [escriba aquí el contenido].\n\n{{abogado}}\nT.P. {{tarjeta}}'};
+  formModal(id?'Editar plantilla':'Nueva plantilla propia',[{k:'nombre',l:'Nombre del formato',req:1,full:1},{k:'base',l:'Se llena con datos de',type:'select',opts:[['proc','Un proceso (y su cliente)'],['cli','Un cliente']]},{k:'texto',l:'Texto del formato',type:'textarea',req:1,full:1,help:'Variables disponibles: '+VARS_PL.map(x=>'{{'+x+'}}').join(' ')+'. Lo que escriba entre [corchetes] queda resaltado para completar. Deje una línea en blanco entre párrafos.'}],pl,d=>{if(id)Object.assign(pl,d);else DB.plantillas.push(Object.assign({id:uid(),oficinaId:S.of},d));toast('Plantilla guardada')});
+  setTimeout(()=>{const t=$('#fx_texto');if(t)t.style.minHeight='260px'},0);
+}
+VISTAS.documentos=()=>{
+  const q=(S.sub.q||'').toLowerCase();const cat=S.sub.cat||'';
+  const L=DOCS.filter(d=>(!cat||d.cat===cat)&&(!q||(d.n+d.d).toLowerCase().includes(q)));
+  const sel=(d,i)=>{const o=d.b==='proc'?optsProc(false):d.b==='cli'?optsCli():de('cobros').map(b=>[b.id,b.numero+' · '+nomCli(b.clienteId)]);return '<select id="ds_'+i+'" style="flex:1;min-width:0" aria-label="Seleccionar '+(d.b==='proc'?'proceso':d.b==='cli'?'cliente':'cuenta')+'">'+o.map(([v,l])=>'<option value="'+v+'">'+esc(l)+'</option>').join('')+'</select>'};
+  const propias=de('plantillas');
+  return head('Documentos',DOCS.length+' formatos base que se llenan con los datos del cliente y del proceso. Puede corregir el texto directamente en pantalla antes de imprimir.',puede('admin','abogado')?'<button class="btn pri" onclick="editarPlantilla()">+ Crear formato propio</button>':'')
+  +'<div class="toolbar"><input type="search" id="q_doc" placeholder="Buscar formato" value="'+esc(S.sub.q||'')+'" oninput="S.sub.q=this.value;buscarEn(\'q_doc\')"><select onchange="S.sub.cat=this.value;render()" aria-label="Categoría"><option value="">Todas las categorías</option>'+CATS_DOC.map(c=>'<option'+(cat===c?' selected':'')+'>'+esc(c)+'</option>').join('')+'</select></div>'
+  +CATS_DOC.filter(c=>L.some(d=>d.cat===c)).map(c=>'<h3 style="margin:16px 0 10px">'+esc(c)+'</h3><div class="grid g2">'+L.filter(d=>d.cat===c).map(d=>{const i=DOCS.indexOf(d);return '<div class="card"><h4>'+esc(d.n)+'</h4><p class="small muted" style="margin:2px 0 8px">'+esc(d.d)+'</p><div class="toolbar" style="margin:0">'+sel(d,i)+'<button class="btn pri" onclick="abrirDoc(\''+d.id+'\',$(\'#ds_'+i+'\').value)">Generar</button></div></div>'}).join('')+'</div>').join('')
+  +'<h3 style="margin:20px 0 10px">Formatos propios de la oficina</h3>'+(propias.length?'<div class="grid g2">'+propias.map(pl=>{const o=pl.base==='proc'?optsProc(false):optsCli();return '<div class="card"><h4>'+esc(pl.nombre)+'</h4><p class="small muted" style="margin:2px 0 8px">Formato propio · se llena con '+(pl.base==='proc'?'un proceso':'un cliente')+'</p><div class="toolbar" style="margin:0"><select id="dp_'+pl.id+'" style="flex:1;min-width:0">'+o.map(([v,l])=>'<option value="'+v+'">'+esc(l)+'</option>').join('')+'</select><button class="btn pri" onclick="abrirPlantillaPropia(\''+pl.id+'\',$(\'#dp_'+pl.id+'\').value)">Generar</button>'+(puede('admin','abogado')?'<button class="btn peq" onclick="editarPlantilla(\''+pl.id+'\')">Editar</button>':'')+'</div></div>'}).join('')+'</div>':'<div class="card empty">Aún no hay formatos propios. Cree los modelos que su oficina usa siempre y la app los llenará con los datos de cada cliente o proceso.</div>')
+  +'<div class="note" style="margin-top:14px">Las cuentas de cobro se generan desde <b>Honorarios y cobros</b>. Los textos son modelos de apoyo: el abogado responsable debe revisarlos y ajustarlos a cada caso.</div>';
+};
+// ===================== DiligencIA · versión real (servidor) =====================
+const COLS=['clientes','procesos','terminos','agenda','tareas','cobros','pagos','gastos','plantillas'];
+const TK='diligencia_token';
+let TOKEN=null,SNAP={},SNAP_OF='',_cola=Promise.resolve();
+ROLES.super={n:'SkyNet Genesis',d:'Administra las oficinas cliente',menu:['super']};
+MENU.super='Oficinas cliente';MENU.cuenta='Mi cuenta';
+const tokGet=()=>{try{return localStorage.getItem(TK)}catch(e){return null}};
+const tokSet=t=>{try{t?localStorage.setItem(TK,t):localStorage.removeItem(TK)}catch(e){}};
+async function api(ruta,cuerpo,metodo){
+  const r=await fetch(API+ruta,{method:metodo||(cuerpo?'POST':'GET'),headers:Object.assign({'content-type':'application/json'},TOKEN?{Authorization:'Bearer '+TOKEN}:{}),body:cuerpo?JSON.stringify(cuerpo):undefined});
+  let j={};try{j=await r.json()}catch(e){}
+  if(r.status===401&&TOKEN){tokSet(null);TOKEN=null;S.user=null;render();throw new Error(j.error||'Sesión terminada')}
+  if(!r.ok)throw new Error(j.error||('Error '+r.status));return j;
+}
+const ofJSON=()=>{const o=OF();if(!o)return '';return JSON.stringify({nombre:o.nombre,nit:o.nit,ciudad:o.ciudad,direccion:o.direccion,tel:o.tel,email:o.email,logo:o.logo,config:{vacancia:o.config.vacancia,semanaSanta:o.config.semanaSanta,cierres:o.config.cierres}})};
+function tomarFoto(){SNAP={};COLS.forEach(c=>(DB[c]||[]).forEach(x=>SNAP[c+'|'+x.id]=JSON.stringify(x)));SNAP_OF=ofJSON()}
+function syncReal(){
+  if(S.user&&S.user.rol==='cliente')return;
+  const cambios=[],borrar=[],vistos=new Set();
+  COLS.forEach(c=>(DB[c]||[]).forEach(x=>{if(!x.oficinaId)x.oficinaId=S.of;const k=c+'|'+x.id;vistos.add(k);const j=JSON.stringify(x);if(SNAP[k]!==j){cambios.push({col:c,id:x.id,datos:JSON.parse(j)});SNAP[k]=j}}));
+  Object.keys(SNAP).forEach(k=>{if(!vistos.has(k)){const i=k.indexOf('|');borrar.push({col:k.slice(0,i),id:k.slice(i+1)});delete SNAP[k]}});
+  const ofj=ofJSON();const ofCambio=ofj!==SNAP_OF&&S.user.rol==='admin';if(ofCambio)SNAP_OF=ofj;
+  if(!cambios.length&&!borrar.length&&!ofCambio)return;
+  marcaSync('Guardando…');
+  _cola=_cola.then(async()=>{
+    try{
+      if(cambios.length||borrar.length)await api('/api/sync',{cambios,borrar});
+      if(ofCambio)await api('/api/oficina',JSON.parse(ofj),'PUT');
+      marcaSync('Guardado ✓');
+    }catch(e){marcaSync('');toast('No se guardó: '+e.message);await recargar()}
+  });
+}
+function marcaSync(t){const el=$('#sync');if(el)el.textContent=t;clearTimeout(marcaSync._t);if(t==='Guardado ✓')marcaSync._t=setTimeout(()=>{const e=$('#sync');if(e)e.textContent=''},2500)}
+async function recargar(silencio){
+  const d=await api('/api/datos');
+  if(d.usuario.super&&!d.oficina){DB={oficinas:[],users:[],plantillas:[]};COLS.forEach(c=>DB[c]=[]);S.of=null;S.user=Object.assign({},d.usuario,{rol:'super'});S.vista='super';render();return}
+  const o=d.oficina;o.config=o.config||{vacancia:true,semanaSanta:true,cierres:[]};o.config.cierres=o.config.cierres||[];
+  DB=Object.assign({oficinas:[o]},d.db);COLS.forEach(c=>DB[c]=DB[c]||[]);
+  S.of=o.id;S.user=Object.assign({},d.usuario);tomarFoto();render();if(!silencio)toast('Datos actualizados');
+}
+async function entrarReal(ev){
+  if(ev)ev.preventDefault();
+  const email=$('#lg_email').value.trim(),password=$('#lg_pass').value;
+  const msg=$('#lg_msg');msg.innerHTML='<span class="muted">Conectando con el servidor… la primera conexión del día puede tardar hasta un minuto.</span>';
+  try{const r=await api('/api/login',{email,password});TOKEN=r.token;tokSet(TOKEN);MODO='real';S.vista='inicio';S.sub={};await recargar(true)}
+  catch(e){msg.innerHTML='<span style="color:var(--rojo)">'+esc(e.message==='Failed to fetch'?'No hay conexión con el servidor. Intente de nuevo en un momento.':e.message)+'</span>'}
+}
+function salir(){TOKEN=null;tokSet(null);S.user=null;S.vista='inicio';S.sub={};if(MODO==='real')cargar();render()}
+const _entrarDemo=entrar;
+entrar=function(rol){cargar();_entrarDemo(rol)};
+
+function vInstalar(){return '<div class="login"><div class="box"><div class="brand" style="color:var(--fg)">'+LOGO_SG.replace('<svg','<svg style="width:52px;height:52px"')+'<div class="bt" style="font-size:30px">DiligencIA<small>INSTALACIÓN</small></div></div><p class="muted" style="margin:12px 0">Cree el usuario de SkyNet Genesis que administra todas las oficinas. Solo funciona una vez.</p><form class="f" onsubmit="instalar(event)"><label class="full">Clave de instalación (SETUP_KEY en Render)<input id="in_k" required></label><label class="full">Su nombre<input id="in_n" value="Ricardo Londoño" required></label><label class="full">Correo<input id="in_e" type="email" value="contacto@skynetgenesis.com" required></label><label class="full">Contraseña (mínimo 8)<input id="in_p" type="password" minlength="8" required></label><div class="full"><button class="btn pri">Crear administrador</button></div><div class="full small" id="in_msg"></div></form></div></div>'}
+async function instalar(ev){ev.preventDefault();const m=$('#in_msg');m.textContent='Conectando… puede tardar hasta un minuto.';try{await api('/api/setup',{clave:$('#in_k').value.trim(),nombre:$('#in_n').value,email:$('#in_e').value,password:$('#in_p').value});m.innerHTML='<b style="color:#1F8A4C">Listo.</b> Ya puede entrar con ese correo. <a href="#" onclick="location.hash=\'\';render();return false">Ir al inicio de sesión</a>'}catch(e){m.innerHTML='<span style="color:var(--rojo)">'+esc(e.message)+'</span>'}}
+function vLogin(){
+  if(API&&!EN_MARCO&&location.hash==='#instalar')return vInstalar();
+  const real=API&&!EN_MARCO;const ofs=DB.oficinas;
+  return '<div class="login"><div class="box"><div class="brand" style="color:var(--fg)">'+LOGO_SG.replace('<svg','<svg style="width:52px;height:52px"')+'<div class="bt" style="font-size:30px">DiligencIA<small>SKYNET GENESIS</small></div></div>'
+  +'<p class="muted" style="margin:12px 0 4px">Control integral de la oficina jurídica: clientes, procesos, términos judiciales, audiencias, alertas y honorarios, con el calendario judicial colombiano.</p>'
+  +(real?'<form class="f" style="margin-top:14px" onsubmit="entrarReal(event)"><label class="full">Correo<input id="lg_email" type="email" autocomplete="username" required></label><label class="full">Contraseña<input id="lg_pass" type="password" autocomplete="current-password" required></label><div class="full"><button class="btn pri" style="width:100%;justify-content:center;padding:11px">Entrar</button></div><div class="full small" id="lg_msg"><span class="muted">¿Olvidó su contraseña? El socio administrador de su oficina puede asignarle una nueva.</span></div></form><h4 style="margin-top:22px;border-top:1px solid var(--line);padding-top:14px">¿Aún no tiene cuenta? Pruebe la demostración</h4>':'')
+  +'<div class="f" style="margin-top:10px"><label>Oficina de ejemplo<select id="lg_of">'+ofs.map(o=>'<option value="'+o.id+'">'+esc(o.nombre)+'</option>').join('')+'</select></label></div>'
+  +'<div class="roles">'+Object.entries(ROLES).filter(([k])=>k!=='super').map(([k,r])=>'<button onclick="entrar(\''+k+'\')"><b>'+r.n+'</b><span>'+r.d+'</span></button>').join('')+'</div>'
+  +'<p class="small muted" style="margin-top:16px">'+(real?'La demostración usa datos de ejemplo guardados solo en este navegador.':'Versión de demostración con datos de ejemplo. La versión con usuarios reales funciona en diligencia.skynetgenesis.com.')+' Contratación y soporte: '+SG.correo+' · WhatsApp 304 437 5758</p></div></div>';
+}
+
+// ---- marco: barra con estado de sincronización, menú con Mi cuenta ----
+const _render=render;
+render=function(){
+  if(!S.user||S.user.rol!=='super'&&!OF()){if(S.user&&!OF())S.user=null;return _render()}
+  if(S.user.rol==='super'){
+    $('#app').innerHTML='<header class="top"><div class="brand">'+LOGO_SG+'<div class="bt">DiligencIA<small>SKYNET GENESIS</small></div></div><div class="ofi"><div style="min-width:0"><div class="ofi-name">Panel SkyNet Genesis</div><div class="ofi-user">'+esc(S.user.nombre)+'</div></div><button class="salir" onclick="salir()">Salir</button></div></header><div class="shell"><nav class="menu">'+['super','cuenta'].map(m=>'<button class="'+(S.vista===m?'on':'')+'" onclick="ir(\''+m+'\')">'+MENU[m]+'</button>').join('')+'</nav><main id="main">'+(S.vista==='cuenta'?VISTAS.cuenta():VISTAS.super())+'</main></div>';return}
+  const r=ROLES[S.user.rol];const base=r.menu.slice();
+  if(MODO==='real'&&!r.menu.includes('cuenta'))r.menu=base.concat('cuenta');
+  if(S.vista==='cuenta'&&MODO!=='real')S.vista=base[0];
+  _render();r.menu=base;
+  const top=$('.top .ofi');
+  if(MODO==='real'&&top){top.insertAdjacentHTML('afterbegin','<span id="sync" class="small" style="opacity:.8;white-space:nowrap"></span><button class="salir" title="Traer cambios de los demás usuarios" onclick="recargar().catch(e=>toast(e.message))">↻</button>')}
+  if(MODO==='demo'&&top){top.insertAdjacentHTML('afterbegin','<span class="pill" style="background:#E0A21A;color:#15232B">DEMOSTRACIÓN</span>')}
+  const m=$('#main');const o=OF();
+  if(m&&MODO==='real'&&o.estado==='solo_consulta')m.insertAdjacentHTML('afterbegin','<div class="note amb" style="margin-bottom:12px"><b>Modo solo consulta.</b> La mensualidad está pendiente; puede ver la información pero no modificarla. Pague con Bold en skynetgenesis.com o escriba a SkyNet Genesis (WhatsApp 304 437 5758).</div>');
+  if(m&&MODO==='real'&&S.user.debeCambiar&&S.vista!=='cuenta')m.insertAdjacentHTML('afterbegin','<div class="note amb" style="margin-bottom:12px">Está usando una contraseña temporal. <a href="#" onclick="event.preventDefault();ir(\'cuenta\')">Cámbiela aquí</a>.</div>');
+};
+
+// ---- Mi cuenta ----
+VISTAS.cuenta=()=>head('Mi cuenta',esc(S.user.email||''))+'<div class="grid g2"><div class="card"><h3>Mis datos</h3><dl class="kv" style="margin-top:10px"><dt>Nombre</dt><dd>'+esc(S.user.nombre)+'</dd><dt>Correo</dt><dd>'+esc(S.user.email||'')+'</dd><dt>Perfil</dt><dd>'+esc((ROLES[S.user.rol]||{}).n||'')+'</dd>'+(OF()?'<dt>Oficina</dt><dd>'+esc(OF().nombre)+'</dd>':'')+'</dl></div><div class="card"><h3>Cambiar contraseña</h3><form class="f" style="margin-top:10px" onsubmit="cambiarClave(event)"><label class="full">Contraseña actual<input id="cl_a" type="password" autocomplete="current-password" required></label><label class="full">Nueva contraseña (mínimo 8 caracteres)<input id="cl_n" type="password" minlength="8" autocomplete="new-password" required></label><label class="full">Repita la nueva contraseña<input id="cl_r" type="password" minlength="8" autocomplete="new-password" required></label><div class="full"><button class="btn pri">Cambiar contraseña</button></div></form></div></div>';
+async function cambiarClave(ev){ev.preventDefault();if($('#cl_n').value!==$('#cl_r').value){toast('Las contraseñas nuevas no coinciden');return}try{await api('/api/cuenta/clave',{actual:$('#cl_a').value,nueva:$('#cl_n').value});S.user.debeCambiar=false;toast('Contraseña cambiada');render()}catch(e){toast(e.message)}}
+
+// ---- usuarios (con contraseña) ----
+const claveTemp=()=>{const c='abcdefghjkmnpqrstuvwxyz';let s='';for(let i=0;i<5;i++)s+=c[Math.floor(Math.random()*c.length)];return 'Dil-'+s+'-'+Math.floor(100+Math.random()*900)};
+function credenciales(nombre,email,clave,tel){
+  const url=API?'https://diligencia.skynetgenesis.com':location.href;
+  const txt='Hola '+nombre.split(' ')[0]+'. Ya tiene acceso a DiligencIA de '+(OF()?OF().nombre:'su oficina')+'.\nIngrese en: '+url+'\nCorreo: '+email+'\nContraseña temporal: '+clave+'\nAl entrar, cámbiela en «Mi cuenta».';
+  modal('Acceso creado','<p>Entregue estos datos a <b>'+esc(nombre)+'</b>. La contraseña no se vuelve a mostrar.</p><pre class="note" style="white-space:pre-wrap;font-family:inherit">'+esc(txt)+'</pre>','<button class="btn" onclick="copiar('+esc(JSON.stringify(txt))+',\'Datos copiados\')">Copiar</button>'+(tel?'<a class="btn wa" target="_blank" rel="noopener" href="'+waLink(tel,txt)+'">Enviar por WhatsApp</a>':'<a class="btn wa" target="_blank" rel="noopener" href="https://wa.me/?text='+encodeURIComponent(txt)+'">Enviar por WhatsApp</a>')+'<button class="btn pri" onclick="cerrar()">Listo</button>');
+}
+editarUsuario=function(id){
+  const u=id?byId('users',id):{rol:'abogado',activo:true};
+  const campos=[{k:'nombre',l:'Nombre completo',req:1},{k:'email',l:'Correo (con este entra a la app)',type:'email',req:1},{k:'rol',l:'Perfil',type:'select',opts:Object.entries(ROLES).filter(([k])=>!['cliente','super'].includes(k)).map(([k,r])=>[k,r.n])},{k:'tp',l:'Tarjeta profesional',ph:'TP 123.456'},{k:'tel',l:'Celular (para enviarle el acceso)'}];
+  if(id)campos.push({k:'activo',l:'Usuario activo',type:'check'});
+  campos.push({k:'password',l:id?'Nueva contraseña temporal (déjela vacía para no cambiarla)':'Contraseña temporal',def:id?'':claveTemp(),req:!id,help:'Mínimo 8 caracteres. El usuario la cambia al entrar.'});
+  formModal(id?'Editar usuario':'Nuevo usuario',campos,id?Object.assign({},u,{password:''}):u,d=>{
+    const plan=PLANES.find(p=>p.id===OF().plan);const abs=de('users').filter(x=>x.activo&&['admin','abogado'].includes(x.rol)&&x.id!==id).length;
+    if((d.activo!==false)&&['admin','abogado'].includes(d.rol)&&abs>=plan.u){toast('El plan '+plan.n+' permite '+plan.u+' abogado(s) activo(s).');return false}
+    if(MODO!=='real'){const tel=d.tel,pw=d.password;delete d.tel;delete d.password;if(id)Object.assign(u,d);else DB.users.push(Object.assign({id:uid(),oficinaId:S.of,activo:true},d));toast('Usuario guardado (demostración)');if(!id&&pw)setTimeout(()=>credenciales(d.nombre,d.email,pw,tel),50);return}
+    const tel=d.tel;delete d.tel;if(id&&!d.password)delete d.password;
+    (id?api('/api/usuarios/'+id,d,'PUT'):api('/api/usuarios',d)).then(r=>{const i=DB.users.findIndex(x=>x.id===r.usuario.id);if(i>=0)DB.users[i]=r.usuario;else DB.users.push(r.usuario);render();if(d.password)credenciales(d.nombre,d.email,d.password,tel);else toast('Usuario actualizado')}).catch(e=>toast(e.message));
+  });
+};
+function accesoPortal(cid){
+  const c=byId('clientes',cid);const ya=de('users').find(u=>u.rol==='cliente'&&u.clienteId===cid);
+  const campos=[{k:'email',l:'Correo del cliente para entrar',type:'email',req:1,def:ya?ya.email:c.email},{k:'password',l:ya?'Nueva contraseña temporal':'Contraseña temporal',req:1,def:claveTemp()}];
+  if(ya)campos.push({k:'activo',l:'Acceso activo',type:'check',def:ya.activo});
+  formModal((ya?'Acceso al portal de ':'Dar acceso al portal a ')+c.nombre,campos,null,d=>{
+    const datos={nombre:c.nombre,email:d.email,rol:'cliente',clienteId:cid,password:d.password};if(ya)datos.activo=d.activo;
+    if(MODO!=='real'){if(ya)Object.assign(ya,{email:d.email,activo:d.activo});else DB.users.push({id:uid(),oficinaId:S.of,nombre:c.nombre,email:d.email,rol:'cliente',clienteId:cid,activo:true});setTimeout(()=>credenciales(c.nombre,d.email,d.password,c.tel),50);return}
+    (ya?api('/api/usuarios/'+ya.id,datos,'PUT'):api('/api/usuarios',datos)).then(r=>{const i=DB.users.findIndex(x=>x.id===r.usuario.id);if(i>=0)DB.users[i]=r.usuario;else DB.users.push(r.usuario);render();credenciales(c.nombre,d.email,d.password,c.tel)}).catch(e=>toast(e.message));
+  },'<p class="small muted full">El cliente verá solo sus procesos (actuaciones marcadas como visibles), sus audiencias y sus cuentas de cobro.</p>');
+}
+const _detalleCliente=detalleCliente;
+detalleCliente=function(id){let h=_detalleCliente(id);if(S.user.rol==='admin'){const ya=de('users').find(u=>u.rol==='cliente'&&u.clienteId===id);h=h.replace('<div class="acc">','<div class="acc"><button class="btn" onclick="accesoPortal(\''+id+'\')">'+(ya?'Acceso al portal ✓':'Dar acceso al portal')+'</button>')}return h};
+const _vUsuarios=VISTAS.usuarios;
+VISTAS.usuarios=()=>{let h=_vUsuarios();const cl=de('users').filter(u=>u.rol==='cliente');if(cl.length)h+='<div class="card" style="margin-top:14px"><h3>Clientes con acceso al portal ('+cl.length+')</h3><div class="list" style="margin-top:6px">'+cl.map(u=>'<div class="li"><div class="grow"><b>'+esc(u.nombre)+'</b><div class="small muted">'+esc(u.email)+'</div></div>'+(u.activo?pill('Activo','p-ver'):pill('Inactivo','p-gris'))+'<button class="btn peq" onclick="accesoPortal(\''+u.clienteId+'\')">Gestionar</button></div>').join('')+'</div></div>';return h};
+const _vConfig=VISTAS.config;
+VISTAS.config=()=>{let h=_vConfig();if(MODO==='real'){h=h.replace(/<button class="btn" onclick="editarOficina\(true\)">\+ Crear otra oficina<\/button>/,'').replace(/<button class="btn peq" onclick="OF\(\)\.plan=[^>]+>Elegir<\/button>/g,'').replace(/<div class="card"><h3>Datos de demostración<\/h3>[\s\S]*?<\/div><\/div><\/div>$/,'</div>');h=h.replace('Pagar mensualidad con Bold ↗</a>','Pagar mensualidad con Bold ↗</a><a class="btn wa" target="_blank" rel="noopener" href="'+waLink(SG.wa,'Hola, quiero cambiar el plan de DiligencIA de '+OF().nombre+'.')+'">Cambiar de plan</a>')}return h};
+
+// ---- panel SkyNet Genesis (súper administrador) ----
+let SUPER=null;
+VISTAS.super=()=>{
+  if(!SUPER){api('/api/super/oficinas').then(r=>{SUPER=r;render()}).catch(e=>toast(e.message));return head('Oficinas cliente','Cargando…')}
+  const pn=id=>(PLANES.find(p=>p.id===id)||{}).n||id;const mrr=SUPER.filter(o=>o.estado==='activa').reduce((s,o)=>s+((PLANES.find(p=>p.id===o.plan)||{}).p||0),0);
+  return head('Oficinas cliente','Cree aquí cada bufete o abogado que contrate DiligencIA y controle su plan y su pago.','<button class="btn" onclick="SUPER=null;render()">↻</button><button class="btn pri" onclick="nuevaOficinaSuper()">+ Nueva oficina</button>')
+  +'<div class="grid g4">'+kpi('Oficinas',SUPER.length,SUPER.filter(o=>o.estado==='activa').length+' activas')+kpi('Ingreso mensual',cop(mrr),'según planes activos')+kpi('Abogados',SUPER.reduce((s,o)=>s+o.abogados,0),'usuarios activos')+kpi('Por vencer',SUPER.filter(o=>o.pagadoHasta&&String(o.pagadoHasta).slice(0,10)<=addD(HOY,5)).length,'pago en 5 días o vencido')+'</div>'
+  +'<div class="tw" style="margin-top:14px"><table><thead><tr><th>Oficina</th><th>Administrador</th><th>Plan</th><th>Pagado hasta</th><th>Estado</th><th>Uso</th><th></th></tr></thead><tbody>'+(SUPER.map(o=>{const ph=o.pagadoHasta?String(o.pagadoHasta).slice(0,10):'';return '<tr><td><b>'+esc(o.nombre)+'</b><div class="small muted">'+esc(o.ciudad||'')+'</div></td><td class="small">'+esc(o.admins||'')+'</td><td>'+esc(pn(o.plan))+'</td><td class="num">'+(ph?fCorta(ph)+(ph<HOY?' '+pill('Vencido','p-rojo'):''):'—')+'</td><td>'+(o.estado==='activa'?pill('Activa','p-ver'):pill('Solo consulta','p-amb'))+'</td><td class="small">'+o.abogados+' abogados · '+o.procesos+' procesos</td><td><button class="btn peq" onclick="editarOficinaSuper(\''+o.id+'\')">Editar</button></td></tr>'}).join('')||'<tr><td colspan="7" class="empty">Aún no hay oficinas. Cree la primera con «+ Nueva oficina».</td></tr>')+'</tbody></table></div>'
+  +'<div class="note" style="margin-top:14px">Cuando una oficina no pague, cámbiela a «Solo consulta»: sus usuarios podrán ver pero no modificar. Al recibir el pago, vuelva a «Activa» y actualice la fecha «Pagado hasta».</div>';
+};
+function nuevaOficinaSuper(){
+  formModal('Nueva oficina cliente',[{k:'nombre',l:'Nombre de la firma o del abogado',req:1,full:1},{k:'nit',l:'NIT o cédula'},{k:'ciudad',l:'Ciudad'},{k:'tel',l:'Teléfono / WhatsApp'},{k:'email',l:'Correo de la oficina',type:'email'},{k:'plan',l:'Plan',type:'select',opts:PLANES.map(p=>[p.id,p.n+' – '+cop(p.p)])},{k:'pagadoHasta',l:'Pagado hasta',type:'date',def:addD(HOY,30)},{k:'an',l:'Nombre del socio administrador',req:1},{k:'ae',l:'Correo del administrador (inicio de sesión)',type:'email',req:1},{k:'ap',l:'Contraseña temporal',req:1,def:claveTemp()}],null,d=>{
+    api('/api/super/oficinas',{nombre:d.nombre,nit:d.nit,ciudad:d.ciudad,tel:d.tel,email:d.email,plan:d.plan,pagadoHasta:d.pagadoHasta,admin:{nombre:d.an,email:d.ae,password:d.ap}}).then(()=>{SUPER=null;render();credenciales(d.an,d.ae,d.ap,d.tel)}).catch(e=>toast(e.message));
+  });
+}
+function editarOficinaSuper(id){const o=SUPER.find(x=>x.id===id);formModal(o.nombre,[{k:'plan',l:'Plan',type:'select',opts:PLANES.map(p=>[p.id,p.n+' – '+cop(p.p)])},{k:'estado',l:'Estado',type:'select',opts:[['activa','Activa'],['solo_consulta','Solo consulta (mensualidad pendiente)']]},{k:'pagadoHasta',l:'Pagado hasta',type:'date'}],{plan:o.plan,estado:o.estado,pagadoHasta:o.pagadoHasta?String(o.pagadoHasta).slice(0,10):''},d=>{api('/api/super/oficinas/'+id,d,'PUT').then(()=>{SUPER=null;render();toast('Oficina actualizada')}).catch(e=>toast(e.message))})}
+
+// ---------- arranque ----------
+cargar();
+TOKEN=API&&!EN_MARCO?tokGet():null;
+if(TOKEN){MODO='real';$('#app').innerHTML='<div class="login"><div class="box"><p class="muted">Conectando con el servidor… la primera conexión del día puede tardar hasta un minuto.</p></div></div>';recargar(true).catch(e=>{TOKEN=null;tokSet(null);MODO='demo';cargar();render();toast(e.message)})}
+else render();
+</script></body></html>
