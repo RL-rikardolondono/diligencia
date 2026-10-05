@@ -14,6 +14,7 @@ const BREVO_KEY = process.env.BREVO_KEY || '';
 const REMITENTE = process.env.REMITENTE || 'contacto@skynetgenesis.com';
 const APP_URL = process.env.APP_URL || 'https://diligencia.skynetgenesis.com';
 
+require('pg').types.setTypeParser(1082, v => v); // fechas como texto AAAA-MM-DD
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: /localhost|127\.0\.0\.1/.test(process.env.DATABASE_URL || '') ? false : { rejectUnauthorized: false }, max: 5, idleTimeoutMillis: 10000 });
 const q = (sql, p) => pool.query(sql, p);
 
@@ -52,12 +53,28 @@ async function usuarioActual(req, res, next) {
   const u = r.rows[0];
   if (!u || !u.activo) return err(res, 401, 'Usuario inactivo');
   req.user = u;
-  if (u.oficina_id) { const o = await q('select * from oficinas where id=$1', [u.oficina_id]); req.of = o.rows[0]; }
+  if (u.oficina_id) { const o = await q('select * from oficinas where id=$1', [u.oficina_id]); req.of = o.rows[0]; req.pago = estadoPago(req.of); if (req.pago.bloqueada && !u.super) return err(res, 402, req.pago.aviso); }
   next();
 }
 const soloAdmin = (req, res, next) => req.user.rol === 'admin' ? next() : err(res, 403, 'Solo el socio administrador puede hacer esto');
 const soloSuper = (req, res, next) => req.user.super ? next() : err(res, 403, 'Solo SkyNet Genesis');
 const envolver = fn => (req, res) => Promise.resolve(fn(req, res)).catch(e => { console.error(e); err(res, 500, 'Error del servidor: ' + e.message); });
+
+
+// -------- regla de cobro (todas las apps SkyNet Genesis) --------
+// Si la mensualidad está vencida: desde el día 5 del mes pendiente se avisa (quedan N días) y el día 10 se cierra el acceso.
+function estadoPago(of) {
+  if (!of || !of.pagado_hasta) return { bloqueada: false, aviso: null };
+  const hoy = cal.HOY();
+  const ph = (of.pagado_hasta instanceof Date ? of.pagado_hasta.toISOString() : String(of.pagado_hasta)).slice(0, 10);
+  if (ph >= hoy) return { bloqueada: false, aviso: null };
+  const d = new Date(ph + 'T12:00:00Z'); d.setUTCDate(1); d.setUTCMonth(d.getUTCMonth() + 1); // primer día del mes pendiente
+  const ini = d.toISOString().slice(0, 10);
+  const dia5 = cal.addD(ini, 4), dia10 = cal.addD(ini, 9);
+  if (hoy >= dia10) return { bloqueada: true, aviso: 'El acceso está suspendido por falta de pago de la mensualidad. Pague con Bold en skynetgenesis.com o escriba a SkyNet Genesis (WhatsApp 304 437 5758) para reactivarlo.' };
+  if (hoy >= dia5) { const n = Math.round((Date.parse(dia10) - Date.parse(hoy)) / 864e5); return { bloqueada: false, aviso: 'Su mensualidad está pendiente. Le quedan ' + n + ' día(s): el ' + cal.fLarga(dia10) + ' se cerrará el acceso si no se registra el pago.', dias: n }; }
+  return { bloqueada: false, aviso: null };
+}
 
 // -------- público --------
 app.get('/', (req, res) => res.json({ app: 'DiligencIA', ok: true }));
@@ -80,6 +97,7 @@ app.post('/api/login', envolver(async (req, res) => {
   const u = r.rows[0];
   if (!u || !(await bcrypt.compare(String(req.body.password || ''), u.hash))) return err(res, 401, 'Correo o contraseña incorrectos');
   if (!u.activo) return err(res, 403, 'Su usuario está inactivo. Consulte al administrador de su oficina.');
+  if (!u.super && u.oficina_id) { const o = (await q('select * from oficinas where id=$1', [u.oficina_id])).rows[0]; const ep = estadoPago(o); if (ep.bloqueada) return err(res, 402, ep.aviso); }
   const token = jwt.sign({ id: u.id }, SECRET, { expiresIn: '12h' });
   res.json({ token, usuario: pub(u) });
 }));
@@ -106,7 +124,7 @@ app.get('/api/datos', auth, usuarioActual, envolver(async (req, res) => {
     db.terminos = []; db.tareas = []; db.gastos = db.gastos.filter(g => ps.includes(g.procesoId)); db.plantillas = [];
     db.users = db.users.filter(x => ['admin', 'abogado'].includes(x.rol)).map(x => ({ id: x.id, nombre: x.nombre, rol: x.rol, email: x.email, tp: x.tp, activo: x.activo }));
   }
-  res.json({ usuario: pub(u), oficina: { id: of.id, ...of.datos, plan: of.plan, estado: of.estado, pagadoHasta: of.pagado_hasta }, db });
+  res.json({ usuario: pub(u), oficina: { id: of.id, ...of.datos, plan: of.plan, estado: of.estado, pagadoHasta: of.pagado_hasta, avisoPago: req.pago ? req.pago.aviso : null }, db });
 }));
 
 app.post('/api/sync', auth, usuarioActual, envolver(async (req, res) => {
@@ -188,7 +206,7 @@ app.get('/api/super/oficinas', auth, usuarioActual, soloSuper, envolver(async (r
   const r = await q(`select o.*, (select count(*)::int from usuarios u where u.oficina_id=o.id and u.activo and u.rol in ('admin','abogado')) abogados,
     (select count(*)::int from registros g where g.oficina_id=o.id and g.coleccion='procesos') procesos,
     (select string_agg(email, ', ') from usuarios u where u.oficina_id=o.id and u.rol='admin') admins from oficinas o order by o.creado desc`);
-  res.json(r.rows.map(o => ({ id: o.id, nombre: o.datos.nombre, ciudad: o.datos.ciudad, plan: o.plan, estado: o.estado, pagadoHasta: o.pagado_hasta, abogados: o.abogados, procesos: o.procesos, admins: o.admins, creado: o.creado })));
+  res.json(r.rows.map(o => ({ id: o.id, nombre: o.datos.nombre, ciudad: o.datos.ciudad, plan: o.plan, estado: o.estado, pagadoHasta: o.pagado_hasta, abogados: o.abogados, procesos: o.procesos, admins: o.admins, creado: o.creado, pago: estadoPago(o) })));
 }));
 app.post('/api/super/oficinas', auth, usuarioActual, soloSuper, envolver(async (req, res) => {
   const b = req.body || {}; const a = b.admin || {};
@@ -207,6 +225,11 @@ app.put('/api/super/oficinas/:id', auth, usuarioActual, soloSuper, envolver(asyn
   const o = r.rows[0];
   await q('update oficinas set plan=$2, estado=$3, pagado_hasta=$4 where id=$1', [o.id, PLANES[b.plan] ? b.plan : o.plan, ['activa', 'solo_consulta'].includes(b.estado) ? b.estado : o.estado, b.pagadoHasta || o.pagado_hasta]);
   res.json({ ok: true });
+}));
+
+app.delete('/api/super/oficinas/:id', auth, usuarioActual, soloSuper, envolver(async (req, res) => {
+  const r = await q('delete from oficinas where id=$1', [req.params.id]);
+  res.json({ ok: true, borradas: r.rowCount });
 }));
 
 // -------- resumen diario por correo (cron-job.org, 1 vez al día) --------
