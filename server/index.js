@@ -97,7 +97,7 @@ app.post('/api/login', envolver(async (req, res) => {
   const u = r.rows[0];
   if (!u || !(await bcrypt.compare(String(req.body.password || ''), u.hash))) return err(res, 401, 'Correo o contraseña incorrectos');
   if (!u.activo) return err(res, 403, 'Su usuario está inactivo. Consulte al administrador de su oficina.');
-  if (!u.super && u.oficina_id) { const o = (await q('select * from oficinas where id=$1', [u.oficina_id])).rows[0]; const ep = estadoPago(o); if (ep.bloqueada) return err(res, 402, ep.aviso); }
+  if (!u.super && u.oficina_id) { const o = (await q('select * from oficinas where id=$1', [u.oficina_id])).rows[0]; const ep = estadoPago(o); if (ep.bloqueada) return res.status(402).json({ error: ep.aviso, codigo: 'cerrada', plan: o.plan, oficina: (o.datos && o.datos.nombre) || '', oficinaId: o.id }); }
   const token = jwt.sign({ id: u.id }, SECRET, { expiresIn: '12h' });
   res.json({ token, usuario: pub(u) });
 }));
