@@ -34,6 +34,10 @@ async function migrar() {
   await q(`create table if not exists oficinas(id text primary key, datos jsonb not null default '{}', plan text not null default 'ind', estado text not null default 'activa', pagado_hasta date, creado timestamptz default now())`);
   await q(`create table if not exists usuarios(id text primary key, oficina_id text references oficinas(id) on delete cascade, email text unique not null, hash text not null, rol text not null, nombre text not null, tp text default '', cliente_id text, activo boolean default true, super boolean default false, debe_cambiar boolean default false, creado timestamptz default now())`);
   await q(`create table if not exists registros(oficina_id text not null references oficinas(id) on delete cascade, coleccion text not null, id text not null, datos jsonb not null, actualizado timestamptz default now(), primary key(oficina_id, coleccion, id))`);
+  // pago por llave con desbloqueo provisional
+  await q(`alter table oficinas add column if not exists provisional_hasta date`);
+  await q(`create table if not exists plataforma(clave text primary key, valor jsonb not null)`);
+  await q(`create table if not exists pagos_llave(id text primary key, oficina_id text not null references oficinas(id) on delete cascade, plan text, valor integer not null, referencia text not null, soporte text, estado text not null default 'pendiente', reportado_por text, creado timestamptz default now(), revisado timestamptz, numero integer, hasta date)`);
 }
 
 const app = express();
@@ -68,6 +72,8 @@ function estadoPago(of) {
   const hoy = cal.HOY();
   const ph = (of.pagado_hasta instanceof Date ? of.pagado_hasta.toISOString() : String(of.pagado_hasta)).slice(0, 10);
   if (ph >= hoy) return { bloqueada: false, aviso: null };
+  const prov = of.provisional_hasta ? (of.provisional_hasta instanceof Date ? of.provisional_hasta.toISOString() : String(of.provisional_hasta)).slice(0, 10) : '';
+  if (prov && prov >= hoy) return { bloqueada: false, aviso: 'Su pago por llave está en revisión. El acceso quedó abierto de forma provisional hasta el ' + cal.fLarga(prov) + '; SkyNet Genesis lo confirmará en ese plazo.', provisional: true };
   const d = new Date(ph + 'T12:00:00Z'); d.setUTCDate(1); d.setUTCMonth(d.getUTCMonth() + 1); // primer día del mes pendiente
   const ini = d.toISOString().slice(0, 10);
   const dia5 = cal.addD(ini, 4), dia10 = cal.addD(ini, 9);
@@ -75,6 +81,69 @@ function estadoPago(of) {
   if (hoy >= dia5) { const n = Math.round((Date.parse(dia10) - Date.parse(hoy)) / 864e5); return { bloqueada: false, aviso: 'Su mensualidad está pendiente. Le quedan ' + n + ' día(s): el ' + cal.fLarga(dia10) + ' se cerrará el acceso si no se registra el pago.', dias: n }; }
   return { bloqueada: false, aviso: null };
 }
+
+// -------- pago por llave (todas las apps SkyNet Genesis) --------
+const VALORES = { ind: 59000, ofi: 129000, fir: 249000, cor: 390000 };
+const finMes = f => { const d = new Date(f.slice(0, 7) + '-01T12:00:00Z'); d.setUTCMonth(d.getUTCMonth() + 1, 0); return d.toISOString().slice(0, 10); };
+const fISO = v => v ? (v instanceof Date ? v.toISOString() : String(v)).slice(0, 10) : '';
+async function datosLlave() { const r = await q("select valor from plataforma where clave='llave'"); return r.rows[0] ? r.rows[0].valor : { llave: '', titular: '', nota: '' }; }
+// Datos para pagar (sin sesión: la ve también una oficina cerrada por pago)
+app.get('/api/pago-info', envolver(async (req, res) => res.json(await datosLlave())));
+// La oficina reporta su pago por llave: con sesión, o con correo y contraseña si está cerrada por pago
+app.post('/api/pago-llave', envolver(async (req, res) => {
+  const b = req.body || {}; let u = null;
+  const t = (req.headers.authorization || '').replace('Bearer ', '');
+  if (t) { try { const p = jwt.verify(t, SECRET); u = (await q('select * from usuarios where id=$1', [p.id])).rows[0]; } catch (e) { u = null; } }
+  if (!u && b.email) { const r = (await q('select * from usuarios where email=$1', [limpio(b.email).toLowerCase()])).rows[0]; if (r && await bcrypt.compare(String(b.password || ''), r.hash)) u = r; }
+  if (!u || !u.activo || !u.oficina_id) return err(res, 401, 'Ingrese con el correo y la contraseña del administrador de la oficina.');
+  if (u.rol !== 'admin') return err(res, 403, 'Solo el socio administrador de la oficina puede reportar el pago.');
+  const of = (await q('select * from oficinas where id=$1', [u.oficina_id])).rows[0];
+  const ref = limpio(b.referencia).slice(0, 60);
+  if (!ref) return err(res, 400, 'Escriba la referencia o número de la transacción.');
+  if (!/^data:image\/(jpeg|png|webp);base64,/.test(String(b.soporte || '')) || String(b.soporte).length > 2500000) return err(res, 400, 'Adjunte la foto del comprobante (imagen JPG o PNG).');
+  const pend = await q("select 1 from pagos_llave where oficina_id=$1 and estado='pendiente'", [of.id]);
+  if (pend.rowCount) return err(res, 409, 'Ya hay un pago por llave en revisión. SkyNet Genesis lo confirmará pronto.');
+  const dup = await q("select 1 from pagos_llave where upper(replace(referencia,' ',''))=upper(replace($1,' ','')) and estado<>'rechazado'", [ref]);
+  if (dup.rowCount) return err(res, 409, 'Esa referencia ya fue reportada.');
+  const id = uid(); const prov = cal.addD(cal.HOY(), 3);
+  await q('insert into pagos_llave(id,oficina_id,plan,valor,referencia,soporte,reportado_por) values($1,$2,$3,$4,$5,$6,$7)', [id, of.id, of.plan, VALORES[of.plan] || 0, ref, b.soporte, u.email]);
+  await q('update oficinas set provisional_hasta=$2 where id=$1', [of.id, prov]);
+  res.json({ ok: true, provisionalHasta: prov, oficina: of.datos.nombre, valor: VALORES[of.plan] || 0 });
+}));
+// Historial de pagos de la oficina (para ver sus recibos)
+app.get('/api/mis-pagos', auth, usuarioActual, envolver(async (req, res) => {
+  if (!req.of) return res.json([]);
+  const r = await q('select id, plan, valor, referencia, estado, creado, revisado, numero, hasta from pagos_llave where oficina_id=$1 order by creado desc limit 24', [req.of.id]);
+  res.json(r.rows);
+}));
+// Panel SkyNet Genesis: llave, pagos por revisar, confirmar o rechazar
+app.put('/api/super/llave', auth, usuarioActual, (req, res, next) => req.user.super ? next() : err(res, 403, 'Solo SkyNet Genesis'), envolver(async (req, res) => {
+  const b = req.body || {}; const v = { llave: limpio(b.llave).slice(0, 80), titular: limpio(b.titular).slice(0, 80), nota: limpio(b.nota).slice(0, 200) };
+  await q("insert into plataforma(clave,valor) values('llave',$1) on conflict (clave) do update set valor=excluded.valor", [v]);
+  res.json({ ok: true, ...v });
+}));
+app.get('/api/super/pagos-llave', auth, usuarioActual, (req, res, next) => req.user.super ? next() : err(res, 403, 'Solo SkyNet Genesis'), envolver(async (req, res) => {
+  const r = await q(`select p.*, o.datos->>'nombre' oficina, o.pagado_hasta from pagos_llave p join oficinas o on o.id=p.oficina_id where p.estado='pendiente' or p.creado > now() - interval '60 days' order by (p.estado='pendiente') desc, p.creado desc limit 60`);
+  res.json(r.rows.map(x => ({ ...x, soporte: x.estado === 'pendiente' ? x.soporte : null, pagado_hasta: fISO(x.pagado_hasta), hasta: fISO(x.hasta) })));
+}));
+app.post('/api/super/pagos-llave/:id/:accion', auth, usuarioActual, (req, res, next) => req.user.super ? next() : err(res, 403, 'Solo SkyNet Genesis'), envolver(async (req, res) => {
+  const p = (await q("select * from pagos_llave where id=$1 and estado='pendiente'", [req.params.id])).rows[0];
+  if (!p) return err(res, 404, 'Ese pago ya fue revisado.');
+  if (req.params.accion === 'rechazar') {
+    await q("update pagos_llave set estado='rechazado', revisado=now() where id=$1", [p.id]);
+    await q('update oficinas set provisional_hasta=null where id=$1', [p.oficina_id]);
+    return res.json({ ok: true, estado: 'rechazado' });
+  }
+  if (req.params.accion !== 'confirmar') return err(res, 400, 'Acción no válida');
+  const of = (await q('select * from oficinas where id=$1', [p.oficina_id])).rows[0];
+  const hoy = cal.HOY(); const prev = cal.addD(hoy.slice(0, 7) + '-01', -1);
+  const base = fISO(of.pagado_hasta) && fISO(of.pagado_hasta) > prev ? fISO(of.pagado_hasta) : prev;
+  const d = new Date(base.slice(0, 7) + '-01T12:00:00Z'); d.setUTCMonth(d.getUTCMonth() + 1); const hasta = finMes(d.toISOString().slice(0, 10));
+  const num = (await q('select coalesce(max(numero),0)+1 n from pagos_llave')).rows[0].n;
+  await q("update pagos_llave set estado='confirmado', revisado=now(), numero=$2, hasta=$3, soporte=null where id=$1", [p.id, num, hasta]);
+  await q('update oficinas set pagado_hasta=$2, provisional_hasta=null where id=$1', [of.id, hasta]);
+  res.json({ ok: true, estado: 'confirmado', numero: num, hasta, oficina: of.datos.nombre, valor: p.valor, referencia: p.referencia, plan: p.plan, fecha: hoy });
+}));
 
 // -------- público --------
 app.get('/', (req, res) => res.json({ app: 'DiligencIA', ok: true }));
@@ -142,7 +211,7 @@ app.get('/api/datos', auth, usuarioActual, envolver(async (req, res) => {
     db.terminos = []; db.tareas = []; db.gastos = db.gastos.filter(g => ps.includes(g.procesoId)); db.plantillas = [];
     db.users = db.users.filter(x => ['admin', 'abogado'].includes(x.rol)).map(x => ({ id: x.id, nombre: x.nombre, rol: x.rol, email: x.email, tp: x.tp, activo: x.activo }));
   }
-  res.json({ usuario: pub(u), oficina: { id: of.id, ...of.datos, plan: of.plan, estado: of.estado, pagadoHasta: of.pagado_hasta, avisoPago: req.pago ? req.pago.aviso : null }, db });
+  res.json({ usuario: pub(u), oficina: { id: of.id, ...of.datos, plan: of.plan, estado: of.estado, pagadoHasta: of.pagado_hasta, avisoPago: req.pago ? req.pago.aviso : null, pagoProvisional: !!(req.pago && req.pago.provisional) }, db });
 }));
 
 app.post('/api/sync', auth, usuarioActual, envolver(async (req, res) => {
