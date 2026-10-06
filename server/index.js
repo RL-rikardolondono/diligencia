@@ -91,6 +91,24 @@ app.post('/api/setup', envolver(async (req, res) => {
   res.json({ ok: true });
 }));
 
+// -------- recuperación de contraseña --------
+const INTENTOS = new Map();
+function frenar(k, max, minutos) { const ahora = Date.now(); const a = (INTENTOS.get(k) || []).filter(t => ahora - t < minutos * 60000); INTENTOS.set(k, a); return a.length >= max; }
+const fallo = k => INTENTOS.set(k, [...(INTENTOS.get(k) || []), Date.now()]);
+const ipDe = req => String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
+function claveTemporal() { const c = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz'; let s = 'Dil'; for (let i = 0; i < 5; i++) s += c[require('crypto').randomInt(c.length)]; return s + require('crypto').randomInt(100, 999); }
+// El administrador de SkyNet Genesis recupera su acceso con la clave de instalación (SETUP_KEY, guardada en Render)
+app.post('/api/recuperar-super', envolver(async (req, res) => {
+  const k = 'rs:' + ipDe(req); if (frenar(k, 5, 15)) return err(res, 429, 'Demasiados intentos. Espere 15 minutos.');
+  const { clave, email, nueva } = req.body || {};
+  if (!SETUP_KEY || String(clave || '').trim() !== SETUP_KEY) { fallo(k); return err(res, 403, 'La clave de instalación no es correcta.'); }
+  if (!nueva || String(nueva).length < 8) return err(res, 400, 'La nueva contraseña debe tener al menos 8 caracteres.');
+  const r = await q('select id from usuarios where email=$1 and super=true', [limpio(email).toLowerCase()]);
+  if (!r.rowCount) { fallo(k); return err(res, 404, 'No hay un administrador de SkyNet Genesis con ese correo.'); }
+  await q('update usuarios set hash=$2, debe_cambiar=false, activo=true where id=$1', [r.rows[0].id, await bcrypt.hash(String(nueva), 10)]);
+  res.json({ ok: true });
+}));
+
 app.post('/api/login', envolver(async (req, res) => {
   const email = limpio(req.body.email).toLowerCase();
   const r = await q('select * from usuarios where email=$1', [email]);
@@ -227,6 +245,14 @@ app.put('/api/super/oficinas/:id', auth, usuarioActual, soloSuper, envolver(asyn
   res.json({ ok: true });
 }));
 
+// El administrador de SkyNet Genesis asigna una contraseña temporal al administrador de una oficina
+app.post('/api/super/oficinas/:id/clave', auth, usuarioActual, soloSuper, envolver(async (req, res) => {
+  const r = await q("select * from usuarios where oficina_id=$1 and rol='admin' order by activo desc, email limit 1", [req.params.id]); const u = r.rows[0];
+  if (!u) return err(res, 404, 'Esta oficina no tiene administrador.');
+  const clave = claveTemporal();
+  await q('update usuarios set hash=$2, debe_cambiar=true, activo=true where id=$1', [u.id, await bcrypt.hash(clave, 10)]);
+  res.json({ ok: true, nombre: u.nombre, email: u.email, clave });
+}));
 app.delete('/api/super/oficinas/:id', auth, usuarioActual, soloSuper, envolver(async (req, res) => {
   const r = await q('delete from oficinas where id=$1', [req.params.id]);
   res.json({ ok: true, borradas: r.rowCount });
