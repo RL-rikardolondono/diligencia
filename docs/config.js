@@ -1,1 +1,1 @@
-window.DILIGENCIA_API='https://diligencia-api.onrender.com';
+window.DILIGENCIA_API="https://diligencia-api.onrender.com";

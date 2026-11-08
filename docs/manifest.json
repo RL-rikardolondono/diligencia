@@ -1,0 +1,25 @@
+{
+ "name": "DiligencIA · SkyNet Genesis",
+ "short_name": "DiligencIA",
+ "description": "Control integral de la oficina jurídica: procesos, términos, audiencias y honorarios.",
+ "lang": "es-CO",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "background_color": "#F4F8FB",
+ "theme_color": "#0B4F8A",
+ "icons": [
+  {
+   "src": "icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any maskable"
+  },
+  {
+   "src": "icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any maskable"
+  }
+ ]
+}
