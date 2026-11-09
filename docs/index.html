@@ -5674,5 +5674,25 @@ function vistaPermitida(v){if(!S.user||S.user.rol==='super')return true;const r=
 // v7.1: las alertas de Inicio solo para quien puede actuar: se quitan las que llevan a una pantalla que el perfil no tiene
 // (Dependiente: «Falta autorización de datos» → Clientes; Contabilidad: audiencias, tareas y vigilancia de procesos…)
 (function(){const _al=alertas;alertas=function(){const L=_al.apply(this,arguments);try{return L.filter(a=>!a.ir||!a.ir[0]||vistaPermitida(a.ir[0]))}catch(e){return L}}})();
+
+// v7.1: fotos reales aprobadas por el dueño (regla de todas las apps de SkyNet Genesis): se cargan de su dirección externa,
+// con texto alternativo; si no cargan, la imagen se quita sin dejar hueco (onerror). Banda discreta: 180 px en escritorio y
+// 130 px en el celular, recortada (object-fit:cover). El sw.js no las guarda (solo cachea lo del mismo sitio).
+const FOTOS_SG={
+  portada:['https://images.pexels.com/photos/8112112/pexels-photo-8112112.jpeg?auto=compress&w=1200','Abogado trabajando en su portátil en su despacho'],
+  registro:['https://images.unsplash.com/photo-1630487656049-6db93a53a7e9?w=1200&q=70&auto=format&fit=crop','Equipo de un bufete revisando documentos en una mesa'],
+  simulador:['https://images.unsplash.com/photo-1596574027151-2ce81d85af3e?w=1200&q=70&auto=format&fit=crop','Joven abogado ante un panel en una audiencia'],
+  cobros:['https://images.unsplash.com/photo-1562564055-71e051d33c19?w=1200&q=70&auto=format&fit=crop','Clienta firmando un documento con su abogada'],
+  procesos:['https://images.pexels.com/photos/7876039/pexels-photo-7876039.jpeg?auto=compress&w=1200','Dos abogados estudiando los documentos de un proceso'],
+  portal:['https://images.unsplash.com/photo-1595986630530-969786b19b4d?w=1200&q=70&auto=format&fit=crop','Clienta sonriendo al revisar su caso en el celular']};
+const fotoSG=(k,ansiosa)=>{const f=FOTOS_SG[k];return '<figure class="foto-sg foto-'+k+'"><img src="'+esc(f[0])+'" alt="'+esc(f[1])+'"'+(ansiosa?'':' loading="lazy"')+' decoding="async" referrerpolicy="no-referrer" onerror="var x=this.closest(\'.foto-sg\');if(x)x.remove()"></figure>'};
+(function(){const st=document.createElement('style');st.textContent='.foto-sg{margin:0 0 14px;height:180px;border-radius:12px;overflow:hidden;background:#E8F1FA;border:1px solid #DCE5EE}.foto-sg img{display:block;width:100%;height:100%;object-fit:cover}.login .foto-sg{height:200px;margin:0 0 16px}@media (max-width:600px){.foto-sg,.login .foto-sg{height:130px}}';document.head.appendChild(st)})();
+(function(){
+  const conFoto=(k,cond)=>{const v=VISTAS[k==='procesos2'?'ronda':k];if(typeof v!=='function')return;const nom=k==='procesos2'?'ronda':k;
+    VISTAS[nom]=function(){const h=v.apply(this,arguments);try{if(typeof h==='string'&&(!cond||cond())&&!h.includes('foto-sg'))return fotoSG(k==='procesos2'?'procesos':k)+h}catch(e){}return h}};
+  conFoto('simulador',()=>!(S.sub&&(S.sub.caso||S.sub.id)));conFoto('cobros');conFoto('procesos',()=>!(S.sub&&S.sub.id));conFoto('procesos2');conFoto('portal');
+  const _vl=vLogin;vLogin=function(){const h=_vl.apply(this,arguments);try{if(typeof h==='string'&&!h.includes('foto-sg'))return h.replace('<div class="login"><div class="box">','<div class="login"><div class="box">'+fotoSG('portada',true))}catch(e){}return h};
+  const _vr=vRegistro;vRegistro=function(){const h=_vr.apply(this,arguments);try{if(typeof h==='string'&&!h.includes('foto-sg')){const i=h.indexOf('<div class="box"'),j=i<0?-1:h.indexOf('>',i);if(j>=0)return h.slice(0,j+1)+fotoSG('registro',true)+h.slice(j+1)}}catch(e){}return h};
+})();
 </script>
 </body></html>
