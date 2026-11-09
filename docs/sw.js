@@ -1,5 +1,5 @@
-// DiligencIA · app instalable (SkyNet Genesis). Versión b38a0e5200
-const C='diligencia-b38a0e5200';const BASE=['./','./index.html','./config.js','./manifest.json','./icon-192.png'];
+// DiligencIA · app instalable (SkyNet Genesis). Versión de06b087a7
+const C='diligencia-de06b087a7';const BASE=['./','./index.html','./config.js','./manifest.json','./icon-192.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(BASE)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(e.request.method!=='GET'||u.origin!==location.origin)return;
