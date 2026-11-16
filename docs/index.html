@@ -3938,7 +3938,7 @@ function bloqueo13(email,bloquear){
 }
 function interna13(id,hacer){
   const o=CTAS13.oficinas.find(x=>x.id===id);if(!o)return;
-  formModal((hacer?'Hacer interna: ':'Quitar interna: ')+o.nombre,[{k:'motivo',l:'Motivo (queda en la bitácora de la oficina)',type:'textarea',req:1,full:1,ph:hacer?'Ej.: empresa propia del dueño (Clínica Reina Elizabeth IPS)':''}],null,d=>{
+  formModal((hacer?'Hacer interna: ':'Quitar interna: ')+o.nombre,[{k:'motivo',l:'Motivo (queda en la bitácora de la oficina)',type:'textarea',req:1,full:1,ph:hacer?'Ej.: empresa propia del dueño':''}],null,d=>{
     if(String(d.motivo||'').length<5){toast('Escriba el motivo (mínimo 5 caracteres).');return false}
     const listo=()=>{CTAS13=null;SUPER=null;render();toast(hacer?'Oficina interna: queda activa sin cobros, sin límite de procesos y con todos los módulos. Quedó registrado en su bitácora.':'La oficina dejó de ser interna: vuelve a la regla de cobro de su plan. Quedó registrado en su bitácora.')};
     if(MODO!=='real'){const of=DB.oficinas.find(x=>x.id===id);if(hacer){const ks=SIM_MODULOS.map(m=>'sim-'+m.id).concat(MKT_EXTRA.map(x=>x.k));of.modulos=of.modulos||{};const dados=ks.filter(k=>!of.modulos[k]);dados.forEach(k=>of.modulos[k]=HOY);of.interna={fecha:HOY,motivo:d.motivo,modulos:dados}}else{((of.interna||{}).modulos||[]).forEach(k=>{if(of.modulos)delete of.modulos[k]});delete of.interna}
