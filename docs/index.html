@@ -3850,7 +3850,7 @@ function olvideClave13(){
 async function pedirEnlace13(ev){
   ev.preventDefault();const email=$('#ol_email').value.trim().toLowerCase();if(!email)return;
   const fin=r=>{const f=$('#ol13');if(!f)return;f.outerHTML='<div class="note" style="margin-top:10px"><b>Listo.</b> Si ese correo tiene una cuenta en DiligencIA, en unos minutos le llega un enlace a <b>'+esc(r.destino||ocultar13(email))+'</b>. Vence en '+esc(r.vence||'1 hora')+' y sirve una sola vez. Revise también la carpeta de correo no deseado.</div>'+(r.demo?'<div class="toolbar" style="margin-top:10px"><button class="btn pri" onclick="abrirDemoClave13('+esc(JSON.stringify(email))+')">Ver la pantalla que abre el enlace (demostración)</button></div>':'')};
-  if(!real13()){fin({destino:ocultar13(esDueno13(email)?'rikardolondono@gmail.com':email),demo:true});return}
+  if(!real13()){fin({destino:ocultar13(esDueno13(email)?'ri@gmail.com':email),demo:true});return}
   msj13('ol_msg','Enviando… puede tardar hasta un minuto.');
   try{fin(await api('/api/clave/olvide',{email,web:$('#ol_web').value}))}catch(e){msj13('ol_msg',e.message==='Failed to fetch'?'No hay conexión con el servidor. Intente de nuevo en un momento.':e.message,1)}
 }
@@ -3922,9 +3922,9 @@ function vCuentas13(){
 function filtrar13(){const t=String(S.sub.q13||'').toLowerCase().trim(),f=S.sub.f13||'';let n=0;document.querySelectorAll('#l13 .li').forEach(el=>{const ok=(!t||el.dataset.t.includes(t))&&(!f||el.dataset.f.split(' ').includes(f));el.style.display=ok?'':'none';if(ok)n++});const v=$('#v13');if(v)v.style.display=n?'none':'';const c=$('#n13');if(c)c.textContent=n+' de '+((CTAS13||{}).cuentas||[]).length}
 async function enlace13(id,btn){
   const c=CTAS13.cuentas.find(x=>x.id===id);if(!c)return;
-  if(btn.dataset.ok!=='1'){btn.dataset.ok='1';btn.textContent='¿Enviar a '+ocultar13(c.dueno?'rikardolondono@gmail.com':c.email)+'?';setTimeout(()=>{if(btn.isConnected){btn.dataset.ok='';btn.textContent='✉ Enviar enlace'}},6000);return}
+  if(btn.dataset.ok!=='1'){btn.dataset.ok='1';btn.textContent='¿Enviar a '+ocultar13(c.dueno?'ri@gmail.com':c.email)+'?';setTimeout(()=>{if(btn.isConnected){btn.dataset.ok='';btn.textContent='✉ Enviar enlace'}},6000);return}
   btn.disabled=true;
-  if(MODO!=='real'){btn.disabled=false;btn.dataset.ok='';btn.textContent='✉ Enviar enlace';modal('Enlace enviado (demostración)','<p>En la versión real le llega a <b>'+esc(ocultar13(c.dueno?'rikardolondono@gmail.com':c.email))+'</b> un correo con un enlace para '+(c.tieneClave?'cambiar':'crear')+' su contraseña. Vence en '+(c.tieneClave?'1 hora':'72 horas')+' y sirve una sola vez.</p>','<button class="btn" onclick="cerrar()">Cerrar</button><button class="btn pri" onclick="abrirDemoClave13('+esc(JSON.stringify(c.email))+')">Ver la pantalla del enlace</button>');return}
+  if(MODO!=='real'){btn.disabled=false;btn.dataset.ok='';btn.textContent='✉ Enviar enlace';modal('Enlace enviado (demostración)','<p>En la versión real le llega a <b>'+esc(ocultar13(c.dueno?'ri@gmail.com':c.email))+'</b> un correo con un enlace para '+(c.tieneClave?'cambiar':'crear')+' su contraseña. Vence en '+(c.tieneClave?'1 hora':'72 horas')+' y sirve una sola vez.</p>','<button class="btn" onclick="cerrar()">Cerrar</button><button class="btn pri" onclick="abrirDemoClave13('+esc(JSON.stringify(c.email))+')">Ver la pantalla del enlace</button>');return}
   try{const r=await api('/api/super/cuentas/'+encodeURIComponent(id)+'/enlace',{});toast(r.enviado?'Enlace enviado a '+r.destino+'. Vence en '+r.vence+' y sirve una sola vez.':'No se pudo enviar el correo en este momento. Intente de nuevo en unos minutos.')}catch(e){toast(e.message)}
   btn.disabled=false;btn.dataset.ok='';btn.textContent='✉ Enviar enlace';
 }
