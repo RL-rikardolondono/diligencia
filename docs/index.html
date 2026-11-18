@@ -4837,7 +4837,7 @@ A.config=PR('Configurar la oficina, los medios de pago y el calendario',[
 A.mensualidad=PR('Pagar la mensualidad',[
   'Abra **Configuración › Plan y suscripción** y pulse **Pagar la mensualidad**.',
   'Se abre el pago seguro de **Bold** (tarjeta, PSE, Nequi, Daviplata y otros medios).',
-  'Cuando Bold confirma el pago, la fecha «Pagado hasta» avanza sola y el recibo queda en la misma pantalla.'],{imp:'Si «Pagado hasta» ya pasó, desde el día 5 del mes siguiente sale en todas las pantallas un aviso rojo con la cuenta regresiva (5, 4, 3, 2 y 1 días) y el día 10 se cierra el acceso de la oficina hasta que Bold confirme el pago; al confirmarse, el acceso vuelve de inmediato. Al terminar la prueba gratis sin pago hay 5 días de aviso y al sexto se cierra. Solo el socio administrador ve el botón de pago; los demás perfiles ven que deben avisarle. Los datos nunca se borran por falta de pago antes del plazo de conservación.'});
+  'Cuando Bold confirma el pago, la fecha «Pagado hasta» avanza sola y el recibo queda en la misma pantalla.'],{imp:'Si «Pagado hasta» ya pasó, del día 1 al 5 del mes siguiente sale en todas las pantallas un aviso rojo con la cuenta regresiva (5, 4, 3, 2 y 1 días) y al terminar el día 5, a las 12 de la noche, se cierra el acceso de la oficina hasta que Bold confirme el pago; al confirmarse, el acceso vuelve de inmediato. Al terminar la prueba gratis sin pago hay 5 días de aviso y al sexto se cierra. Solo el socio administrador ve el botón de pago; los demás perfiles ven que deben avisarle. Los datos nunca se borran por falta de pago antes del plazo de conservación.'});
 A.usuarios=PR('Crear usuarios y asignar perfiles',[
   'Abra **Usuarios** y pulse **+ Nuevo usuario**. Los usuarios son ilimitados en todos los planes.',
   'Escriba nombre, correo (con él entra a la app), tarjeta profesional si es abogado y elija el **perfil**: Socio administrador, Abogado, Dependiente judicial o Contabilidad. La tabla «Qué puede hacer cada perfil» le ayuda a decidir.',
@@ -6178,10 +6178,10 @@ function poderdanteTxt(c){c=c||{};const F=x=>'['+x+']';const mail=c.canal||c.ema
 // unidades con singular y plural («1 mes», «3 días hábiles»)
 function uni11(n,u){n=Number(n);const S1={h:'día hábil',c:'día calendario',m:'mes',a:'año'},P={h:'días hábiles',c:'días calendario',m:'meses',a:'años'};return n+' '+((n===1?S1:P)[u]||u)}
 // regla de cobro (la misma de server/pago.js; los textos de términos, manual y panel salen de aquí)
-function reglaCobro(){return {avisoDesde:5,cierreDia:10,graciaPrueba:5,soporte:'304 437 5758'}} // función (no constante): también la usa la primera pantalla
+function reglaCobro(){return {avisoDesde:1,ultimoDia:5,graciaPrueba:5,soporte:'304 437 5758'}} // regla general de SkyNet Genesis (18 nov 2026); función: también la usa la primera pantalla
 function reglaCobroTxt(k){const R=reglaCobro();
-  if(k==='prueba')return 'Si la prueba gratis termina sin pago, durante '+R.graciaPrueba+' días sale un aviso rojo con la cuenta regresiva y al '+(R.graciaPrueba+1)+'.º día se cierra el acceso hasta que pague; la información se conserva.';
-  if(k==='mes')return 'Si un mes queda sin pagar, desde el día '+R.avisoDesde+' de ese mes sale en todas las pantallas un aviso rojo con la cuenta regresiva (de 5 a 1 días) y el día '+R.cierreDia+' se cierra el acceso hasta que pague; al confirmarse el pago con Bold el acceso vuelve al instante.';
+  if(k==='prueba')return 'Si la prueba gratis termina sin pago, durante '+R.graciaPrueba+' días sale un aviso rojo con la cuenta regresiva (de 5 a 1) y al terminar el '+R.graciaPrueba+'.º día, a las 12 de la noche, se cierra el acceso hasta que pague; la información se conserva.';
+  if(k==='mes')return 'Si un mes queda sin pagar, del día '+R.avisoDesde+' al '+R.ultimoDia+' de ese mes sale en todas las pantallas un aviso rojo con la cuenta regresiva (de 5 a 1 días) y al terminar el día '+R.ultimoDia+', a las 12 de la noche, se cierra el acceso hasta que pague; al confirmarse el pago con Bold el acceso vuelve al instante.';
   if(k==='cancelar')return 'El socio administrador puede cancelar el servicio cuando quiera en Configuración › Plan y suscripción: el acceso sigue hasta el último día pagado y la información se conserva 90 días para descargarla (acuerdo de tratamiento de datos, cláusula 11).';
   return ''}
 const WA_SOPORTE73=waLink(SG.wa,'Hola, necesito ayuda con el pago de DiligencIA.');
